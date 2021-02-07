@@ -106,6 +106,22 @@ class Image
         return $this->type;
     }
     
+    public function getWidth(): int
+    {
+        if (!isset($this->width)) {
+            $this->initImageInfoFromFile();
+        }
+        return $this->width;
+    }    
+    
+    public function getHeight(): int
+    {
+        if (!isset($this->height)) {
+            $this->initImageInfoFromFile();
+        }
+        return $this->height;
+    }    
+        
     public function getFileSize(): ?int
     {
         if (!isset($this->file)) {
