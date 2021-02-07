@@ -27,7 +27,7 @@ class Image
     /** @var mix */
     private $resource;
     
-    /** @var int constant IMG_XXX */
+    /** @var int constant IMAGETYPE_XXX */
     private $type;
 
     /** @var int */
@@ -98,12 +98,31 @@ class Image
         return $this->file ? $this->file->getPath() : null;
     }
     
-    public function save(string $path): Image
+    public function getType(): int
     {
-        $this->getGraphicLibrary()->save($this);
+        if (!isset($this->type)) {
+            $this->initImageInfoFromFile();
+        }
+        return $this->type;
     }
     
-    private function getGraphicLibrary()
+    public function getFileSize(): ?int
+    {
+        if (!isset($this->file)) {
+            return null;
+        }         
+        if (empty($this->file->getSize())) {
+            $this->initImageInfoFromFile();
+        }
+        return $this->file->getSize();
+    }    
+    
+    public function save(string $path): Image
+    {
+        $this->getGraphicLibrary()->save($this->getResource(), $path, $this->getType());
+    }
+    
+    private function getGraphicLibrary(): GraphicLibraryInterface
     {
         if (!isset($this->graphicLibrary)) {
             foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
@@ -116,5 +135,25 @@ class Image
             }
         }
         return $this->graphicLibrary;
+    }
+    
+    private function getResource()
+    {
+        return $this->getGraphicLibrary()->open(
+            $this->file->getPath() ?? $this->file->getUrl(),
+            $this->getType()
+        );
+    }
+    
+    private function initImageInfoFromFile(): void
+    {        
+        $imageFileInfo = new ImageFileInfo();
+        list(
+            'width' => $this->width, 
+            'height' => $this->height, 
+            'type' => $this->type,
+            'file_size' => $fileSize,
+        ) = $imageFileInfo->imageInfo($this->file);
+        $this->file->setSize($fileSize);
     }
 }
