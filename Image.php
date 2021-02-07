@@ -2,17 +2,27 @@
 /**
  * PHP Library for Image processing and creating thumbnails
  *
- * @package mavik\Image
+ * @package Mavik\Image
  * @author Vitalii Marenkov <admin@mavik.com.ua>
  * @copyright 2021 Vitalii Marenkov
  * @license MIT; see LICENSE
  */
-namespace mavik\Image;
+namespace Mavik\Image;
 
 class Image
 {
+    const DEFAULT_CONFIGURATION = [
+        'graphic_library' => [
+            'priority' => [
+                'gmagick',
+                'imagick',
+                'gd2',
+            ]
+        ]
+    ];
+
     /** @var array */
-    private static $configuration;
+    private static $configuration = [];
     
     /** @var mix */
     private $resource;
@@ -27,18 +37,25 @@ class Image
     private $height;
  
     /** @var File */
-    public $file;
-        
-    public static function configure(array $configuration)
+    private $file;
+    
+    /** @var GraphicLibrary */
+    private $graphicLibrary;
+    
+    public static function configure(array $configuration): void
     {
-        self::$configuration = $configuration;
+        self::$configuration = array_merge(
+            self::DEFAULT_CONFIGURATION,
+            self::$configuration,
+            $configuration
+        );            
     }
 
     /**
      * @param string $fileName Path or URL
      */
     public function __construct(string $fileName = null)
-    {
+    {        
         if (!empty($fileName)) {
             $this->open($fileName);
         }
@@ -71,13 +88,33 @@ class Image
         $image->loadFromString($content);
     }
     
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
-        return $this->file->getUrl();
+        return $this->file ? $this->file->getUrl() : null;
     }
     
-    public function getPath(): string
+    public function getPath(): ?string
     {
-        return $this->file->getPath();
+        return $this->file ? $this->file->getPath() : null;
+    }
+    
+    public function save(string $path): Image
+    {
+        $this->getGraphicLibrary()->save($this);
+    }
+    
+    private function getGraphicLibrary()
+    {
+        if (!isset($this->graphicLibrary)) {
+            foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
+                $className = 'Graphiclibrary\\' . ucfirst(strtolower($libraryName));
+                if (class_exists($className) && $className::isInstalled()) {
+                    $this->graphicLibrary = new $className(self::$configuration['graphic_library']);
+                    break;
+                }
+                throw new Exception\ConfigurationException('Configuration error: None of the required graphics libraries are installed.');
+            }
+        }
+        return $this->graphicLibrary;
     }
 }
