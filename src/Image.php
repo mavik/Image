@@ -36,7 +36,7 @@ class Image
     /** @var int */
     private $height;
  
-    /** @var File */
+    /** @var ImageFile */
     private $file;
     
     /** @var GraphicLibrary */
@@ -66,7 +66,7 @@ class Image
      */
     public function open(string $fileName)
     {
-        $this->file = new File($fileName);
+        $this->file = new ImageFile($fileName);
     }
 
     /**
