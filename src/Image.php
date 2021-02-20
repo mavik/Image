@@ -98,6 +98,9 @@ class Image
         return $this->file ? $this->file->getPath() : null;
     }
     
+    /**
+     * @return int IMAGETYPE_XXX
+     */
     public function getType(): int
     {
         if (!isset($this->type)) {
