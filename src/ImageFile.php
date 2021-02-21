@@ -65,12 +65,52 @@ class ImageFile
         }       
         return $this->fileSize;
     }
+    
+    /**
+     * @return int IMAGETYPE_XXX
+     */
+    public function getType(): int
+    {
+        if (!isset($this->type)) {
+            $this->initImageInfo();
+        }
+        return $this->type;
+    }
+    
+    public function getWidth(): int
+    {
+        if (!isset($this->width)) {
+            $this->initImageInfo();
+        }
+        return $this->width;
+    }
+    
+    public function getHeight(): int
+    {
+        if (!isset($this->height)) {
+            $this->ImageInfo();
+        }
+        return $this->height;
+    }
 
     private function isUrl(string $file): bool
     {
         return preg_match('/^\w+\:\/\//', $file);
     }
     
+    private function initImageInfo()
+    {
+        if ($this->path) {
+            list(
+                $this->width,
+                $this->height,
+                $this->type
+            ) = getimagesize($this->path);
+        } else {
+            $this->initImageInfoFromUrl();
+        }
+    }
+
     private function initFileSize(): void
     {
         if ($this->path) {
@@ -88,6 +128,12 @@ class ImageFile
         }        
     }
     
+    /**
+     * Set type, width, height and size of file
+     * 
+     * @return void
+     * @throws FileException
+     */
     private function initImageInfoFromUrl(): void
     {
         $context = stream_context_create([
