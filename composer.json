@@ -15,8 +15,8 @@
     ],    
     "autoload": {
         "psr-4": {
-            "Mavik\\Thumbnails\\": "src/",
-            "Mavik\\Thumbnails\\Tests\\": "tests/"
+            "Mavik\\Image\\": "src/",
+            "Mavik\\Image\\Tests\\": "tests/"
         }
     }
 }
