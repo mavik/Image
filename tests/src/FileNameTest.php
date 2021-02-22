@@ -1,0 +1,125 @@
+<?php
+/*
+ * PHP Library for Image processing and creating thumbnails
+ *
+ * @package Mavik\Image
+ * @author Vitalii Marenkov <admin@mavik.com.ua>
+ * @copyright 2021 Vitalii Marenkov
+ * @license MIT; see LICENSE
+*/
+
+namespace Mavik\Image;
+
+use PHPUnit\Framework\TestCase;
+
+class FileNameTest extends TestCase
+{   
+    /**
+     * @covers FileName::getPath
+     * @dataProvider files
+     */
+    public function testGetPath(array $config, string $src, string $path = null, string $url = null)
+    {
+        FileName::configure($config);
+        $fileName = new FileName($src);
+        $this->assertEquals($path, $fileName->getPath());
+    }
+    
+    /**
+     * @covers FileName::getPath
+     * @dataProvider files
+     */
+    public function testGetUrl(array $config, string $src, string $path = null, string $url = null)
+    {
+        FileName::configure($config);
+        $fileName = new FileName($src);
+        $this->assertEquals($url, $fileName->getUrl());
+    }
+        
+    public function files()
+    {
+        return [
+            [   0 =>
+                [
+                    'base_url' => 'http://test.com/',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                'http://test.com/images/apple.jpg',
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                'http://test.com/images/apple.jpg'
+            ],[ 1 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                'http://test.com/resources/images/apple.jpg',
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                'http://test.com/resources/images/apple.jpg'
+            ],[ 2 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                'http://test2.com/resources/images/apple.jpg',
+                null,
+                'http://test2.com/resources/images/apple.jpg',
+            ],[ 3 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                'http://test.com/site2/images/apple.jpg',
+                null,
+                'http://test.com/site2/images/apple.jpg'
+            ],[ 4 =>
+                [
+                    'base_url' => 'http://test.com/resources/',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                '/resources/images/apple.jpg',
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                'http://test.com/resources/images/apple.jpg'
+            ],[ 5 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources/'
+                ],
+                'images/apple.jpg',
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                'http://test.com/resources/images/apple.jpg'
+            ],[ 6 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                'http://test.com/resources/images/apple.jpg'
+            ],[ 7 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                __DIR__ . '/../resources/images/apple.jpg',
+                realpath(__DIR__ . '/../resources/images/apple.jpg'),
+                'http://test.com/resources/images/apple.jpg'
+            ],[ 8 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                'resources/images/beach.webp',
+                realpath(__DIR__ . '/../resources/images/beach.webp'),
+                'http://test.com/resources/images/beach.webp'
+            ],[ 9 =>
+                [
+                    'base_url' => 'http://test.com/resources',
+                    'web_root_dir' => __DIR__ . '/../resources'
+                ],
+                'src/../resources/images/beach.webp',
+                realpath(__DIR__ . '/../resources/images/beach.webp'),
+                'http://test.com/resources/images/beach.webp'
+            ]
+        ];
+    }
+}
