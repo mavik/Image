@@ -36,16 +36,10 @@ class ImageFile
      */
     private $type;
     
-    /**
-     * @param string $fileName Path or URL
-     */
-    public function __construct(string $fileName)
+    public function __construct(string $url= null, string $path = null)
     {
-        if ($this->isUrl($fileName)) {
-            $this->url = $fileName;
-        } else {
-            $this->path = $fileName;
-        }
+        $this->path = $path;
+        $this->url = $url;
     }
     
     public function getPath(): ?string
@@ -88,7 +82,7 @@ class ImageFile
     public function getHeight(): int
     {
         if (!isset($this->height)) {
-            $this->ImageInfo();
+            $this->initImageInfo();
         }
         return $this->height;
     }
@@ -140,9 +134,8 @@ class ImageFile
             'http' => [
                 'header' => 'Range: bytes=0-65536',
             ]
-        ]);
-        // urlencode - php documentaion says it is needed for file_get_contents()
-        $imageData = file_get_contents(urlencode($this->url), false, $context, 0, 65536);
+        ]);        
+        $imageData = @file_get_contents($this->url, false, $context, 0, 65536);
         if ($imageData === false) {
             throw new FileException("Can't open URL \"{$this->url}\"");
         }        
@@ -150,7 +143,8 @@ class ImageFile
         $httpHeaders = $this->parseHttpHeaders($http_response_header);
         $this->fileSize = $this->fileSizeFromHttpHeaders($httpHeaders);
         if (!isset($this->fileSize)) {
-            throw new FileException("Can't get size of file \"{$this->url}\"");
+            $imageData = file_get_contents($this->url);
+            $this->fileSize = strlen($imageData);
         }
         $imageSize = getimagesizefromstring($imageData);
         if (!isset($imageSize[0]) || !isset($imageSize[1]) || !isset($imageSize[2])) {

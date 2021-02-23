@@ -4,46 +4,74 @@ namespace Mavik\Image;
 use PHPUnit\Framework\TestCase;
 use Mavik\Image\Tests\HttpServer;
 
-class ImageFileInfoTest extends TestCase
-{
-    /**
-     * @var ImageFileInfo
-     */
-    static protected $imageFileInfo;
-    
+class ImageFileTest extends TestCase
+{   
     public static function setUpBeforeClass(): void
     {
         $webRoot = __DIR__ . '/../resources/images';
         HttpServer::start($webRoot);
-        self::$imageFileInfo = new ImageFileInfo();
     }
     
     /**
-     * @covers ImageFileInfo::imageInfo
+     * @covers ImageFile::getFileSize
      * @dataProvider correctImagesProvider
      */
-    public function testImageInfoCorrectImages(string $src, array $trueResult)
+    public function testGetFileSize(string $url, string $path = null, array $trueResult)
     {        
-        $file = new File($src);
-        $result = self::$imageFileInfo->imageInfo($file);        
-        $this->assertEquals($trueResult, $result);
+        $file = new ImageFile($url, $path);
+        $fileSize = $file->getFileSize();
+        $this->assertEquals($trueResult['file_size'], $fileSize);
     }
-
+    
     /**
-     * @covers ImageFileInfo::imageInfo
+     * @covers ImageFile::getWidth
+     * @dataProvider correctImagesProvider
+     */
+    public function testGetWidth(string $url, string $path = null, array $trueResult)
+    {        
+        $file = new ImageFile($url, $path);
+        $width = $file->getWidth();
+        $this->assertEquals($trueResult['width'], $width);
+    }
+    
+    /**
+     * @covers ImageFile::getHeight
+     * @dataProvider correctImagesProvider
+     */
+    public function testGetHeight(string $url, string $path = null, array $trueResult)
+    {        
+        $file = new ImageFile($url, $path);
+        $height = $file->getHeight();
+        $this->assertEquals($trueResult['height'], $height);
+    }
+    
+    /**
+     * @covers ImageFile::getType
+     * @dataProvider correctImagesProvider
+     */
+    public function testGetType(string $url, string $path = null, array $trueResult)
+    {        
+        $file = new ImageFile($url, $path);
+        $type = $file->getType();
+        $this->assertEquals($trueResult['type'], $type);
+    }
+    
+    /**
+     * @covers ImageFile::getFileSize
      * @dataProvider wrongImagesProvider
      */    
-    public function testImageInfoWrongImages(string $src, string $messageRegExp)
+    public function testImageFileGetFileSize_WrongImages(string $url, string $path = null, string $messageRegExp)
     {
         $this->expectExceptionMessageMatches($messageRegExp);        
-        $file = new File($src);
-        self::$imageFileInfo->imageInfo($file);
+        $file = new ImageFile($url, $path);
+        $file->getFileSize();
     }
 
     public function correctImagesProvider()
     {
         return [
-            'apple.jpg' => [
+            0 => [
+                'http://localhost:8888/images/apple.jpg',
                 __DIR__ . '/../resources/images/apple.jpg',
                 [
                     'width'     => 1200,
@@ -52,7 +80,8 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 224643,
                 ]
             ],
-            'butterfly_with_transparent_bg.png' => [
+            1 => [
+                'http://localhost:8888/images/butterfly_with_transparent_bg.png',
                 __DIR__ . '/../resources/images/butterfly_with_transparent_bg.png',
                 [
                     'width'     => 1280,
@@ -61,8 +90,9 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 308897,    
                 ]
             ],
-            'chrismas_tree_with_transparent_bg.png' => [
-                __DIR__ . '/../resources/images/chrismas_tree_with_transparent_bg.png',
+            2 => [
+                'http://localhost:8888/images/chrismas tree with transparent bg.png',
+                __DIR__ . '/../resources/images/chrismas tree with transparent bg.png',
                 [
                     'width'     => 1615,
                     'height'    => 1920,
@@ -70,7 +100,8 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 141327,    
                 ]
             ],
-            'pinapple-animated.gif' => [
+            3 => [
+                'http://localhost:8888/images/pinapple-animated.gif',
                 __DIR__ . '/../resources/images/pinapple-animated.gif',
                 [
                     'width'     => 457,
@@ -79,7 +110,8 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 157012,
                 ]
             ],
-            'snowman-pixel.gif' => [
+            4 => [
+                'http://localhost:8888/images/snowman-pixel.gif',
                 __DIR__ . '/../resources/images/snowman-pixel.gif',
                 [
                     'width'     => 700,
@@ -88,7 +120,8 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 53777,
                 ]
             ],
-            'tree_with_white_background.jpg' => [
+            5 => [
+                'http://localhost:8888/images/tree_with_white_background.jpg',
                 __DIR__ . '/../resources/images/tree_with_white_background.jpg',
                 [
                     'width'     => 1280,
@@ -97,7 +130,8 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 181304,
                 ]
             ],
-            'house.webp' => [
+            6 => [
+                'http://localhost:8888/images/house.webp',
                 __DIR__ . '/../resources/images/house.webp',
                 [
                     'width'     => 1536,
@@ -106,7 +140,8 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 644986,
                 ]
             ],
-            'beach.webp' => [
+            7 => [
+                'http://localhost:8888/images/beach.webp',
                 __DIR__ . '/../resources/images/beach.webp',
                 [
                     'width'     => 730,
@@ -115,8 +150,9 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 69622,
                 ]
             ],
-            'http://localhost:8888/apple.jpg' => [
+            8 => [
                 'http://localhost:8888/apple.jpg',
+                null,
                 [
                     'width'     => 1200,
                     'height'    => 1200,
@@ -124,8 +160,9 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 224643,    
                 ]
             ],
-            'http://localhost:8888/beach.webp' => [
+            9 => [
                 'http://localhost:8888/beach.webp',
+                null,
                 [
                     'width'     => 730,
                     'height'    => 352,
@@ -133,8 +170,9 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 69622,
                 ]
             ],
-            'https://upload.wikimedia.org/wikipedia/en/a/a7/Culinary_fruits_cropped_top_view.jpg' => [
+            10 => [
                 'https://upload.wikimedia.org/wikipedia/en/a/a7/Culinary_fruits_cropped_top_view.jpg',
+                null,
                 [
                     'width'     => 3224,
                     'height'    => 2145,
@@ -142,8 +180,9 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 2925171,
                 ]
             ],
-            'https://pixnio.com/free-images/2020/01/24/2020-01-24-08-50-32-1200x800.jpg' => [
+            11 => [
                 'https://pixnio.com/free-images/2020/01/24/2020-01-24-08-50-32-1200x800.jpg',
+                null,
                 [
                     'width'     => 1200,
                     'height'    => 800,
@@ -151,9 +190,17 @@ class ImageFileInfoTest extends TestCase
                     'file_size' => 169395,
                 ]
             ],
-            /**
-             * @todo Создать файл php возбращающий изображение и добавить тут тест для него
-             */
+            12 => [
+                'http://localhost:8888/apple.php',
+                null,
+                [
+                    'width'     => 1200,
+                    'height'    => 1200,
+                    'type'      => IMAGETYPE_JPEG,
+                    'file_size' => 224643,    
+                ]
+            ],
+            
         ];        
     }
     
@@ -162,11 +209,13 @@ class ImageFileInfoTest extends TestCase
         return [
             'http://localhost:8888/404.jpg' => [
                 'http://localhost:8888/404.jpg',
-                '/^Cannot get size of file.*/',
+                null,
+                '/^Can\'t open URL/',
             ],
             'http://localhost:8888/not_image.jpg' => [
                 'http://localhost:8888/not_image.jpg',
-                '/^Cannot get size of image.*/',
+                null,
+                '/^Can\'t get size or type of image/',
             ],            
         ];
     }

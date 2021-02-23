@@ -18,7 +18,9 @@ class Image
                 'imagick',
                 'gd2',
             ]
-        ]
+        ],
+        'base_url' => '',
+        'web_root_dir' => '',
     ];
 
     /** @var array */
@@ -48,7 +50,12 @@ class Image
             self::DEFAULT_CONFIGURATION,
             self::$configuration,
             $configuration
-        );            
+        );
+        
+        FileName::configure([
+            'base_url' => $configuration['base_url'],
+            'web_root_dir' => $configuration['web_root_dir'],
+        ]);
     }
 
     /**
@@ -62,11 +69,12 @@ class Image
     }
     
     /**
-     * @param string $fileName Path or URL
+     * @param string $src Path or URL
      */
-    public function open(string $fileName)
+    public function open(string $src)
     {
-        $this->file = new ImageFile($fileName);
+        $fileName = new FileName($src);
+        $this->file = new ImageFile($fileName->getUrl(), $fileName->getPath());
     }
 
     /**
