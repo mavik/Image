@@ -36,9 +36,29 @@ class ImageTest extends TestCase
         $image = new Image($fileName);
         $this->assertEquals($info['type'], $image->getType());
     }
+
+    /**
+     * @covers Image::getWidth
+     * @dataProvider files
+     */
+    public function testGetWidth(string $fileName, array $info)
+    {
+        $image = new Image($fileName);
+        $this->assertEquals($info['width'], $image->getWidth());
+    }
     
     /**
-     * @covers Image::getType
+     * @covers Image::getHeight
+     * @dataProvider files
+     */
+    public function testGetHeight(string $fileName, array $info)
+    {
+        $image = new Image($fileName);
+        $this->assertEquals($info['height'], $image->getHeight());
+    }    
+    
+    /**
+     * @covers Image::getFileSize
      * @dataProvider files
      */
     public function testGetFileSize(string $src, array $info)
