@@ -31,9 +31,9 @@ class ImageTest extends TestCase
      * @covers Image::getType
      * @dataProvider files
      */
-    public function testGetType(string $fileName, array $info)
+    public function testGetType(string $src, array $info)
     {
-        $image = new Image($fileName);
+        $image = new Image($src);
         $this->assertEquals($info['type'], $image->getType());
     }
 
@@ -41,9 +41,9 @@ class ImageTest extends TestCase
      * @covers Image::getWidth
      * @dataProvider files
      */
-    public function testGetWidth(string $fileName, array $info)
+    public function testGetWidth(string $src, array $info)
     {
-        $image = new Image($fileName);
+        $image = new Image($src);
         $this->assertEquals($info['width'], $image->getWidth());
     }
     
@@ -51,9 +51,9 @@ class ImageTest extends TestCase
      * @covers Image::getHeight
      * @dataProvider files
      */
-    public function testGetHeight(string $fileName, array $info)
+    public function testGetHeight(string $src, array $info)
     {
-        $image = new Image($fileName);
+        $image = new Image($src);
         $this->assertEquals($info['height'], $image->getHeight());
     }    
     
