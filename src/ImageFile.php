@@ -38,6 +38,9 @@ class ImageFile
     
     public function __construct(string $url= null, string $path = null)
     {
+        if(empty($url) && empty($path)) {
+            throw new FileException('URL and path can\'n by empty at the same time.');
+        }
         $this->path = $path;
         $this->url = $url;
     }
