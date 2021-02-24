@@ -112,7 +112,7 @@ class Image
     public function getType(): int
     {
         if (!isset($this->type)) {
-            $this->initImageInfoFromFile();
+            $this->type = $this->file ? $this->file->getType() : null;
         }
         return $this->type;
     }
@@ -120,7 +120,7 @@ class Image
     public function getWidth(): int
     {
         if (!isset($this->width)) {
-            $this->initImageInfoFromFile();
+            $this->width = $this->file ? $this->file->getType() : null;
         }
         return $this->width;
     }    
@@ -128,20 +128,14 @@ class Image
     public function getHeight(): int
     {
         if (!isset($this->height)) {
-            $this->initImageInfoFromFile();
+            $this->height = $this->file ? $this->file->getHeight() : null;
         }
         return $this->height;
     }    
         
     public function getFileSize(): ?int
     {
-        if (!isset($this->file)) {
-            return null;
-        }         
-        if (empty($this->file->getSize())) {
-            $this->initImageInfoFromFile();
-        }
-        return $this->file->getSize();
+        return $this->file ? $this->file->getFileSize() : null;
     }    
     
     public function save(string $path): Image
@@ -164,23 +158,14 @@ class Image
         return $this->graphicLibrary;
     }
     
-    private function getResource()
+    private function getResource(): mix
     {
-        return $this->getGraphicLibrary()->open(
-            $this->file->getPath() ?? $this->file->getUrl(),
-            $this->getType()
-        );
-    }
-    
-    private function initImageInfoFromFile(): void
-    {        
-        $imageFileInfo = new ImageFileInfo();
-        list(
-            'width' => $this->width, 
-            'height' => $this->height, 
-            'type' => $this->type,
-            'file_size' => $fileSize,
-        ) = $imageFileInfo->imageInfo($this->file);
-        $this->file->setSize($fileSize);
+        if (!isset($this->resource)) {
+            $this->resource = $this->getGraphicLibrary()->open(
+                $this->file->getPath() ?? $this->file->getUrl(),
+                $this->getType()
+            );
+        }
+        return $this->resource;
     }
 }
