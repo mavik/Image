@@ -120,7 +120,7 @@ class Image
     public function getWidth(): int
     {
         if (!isset($this->width)) {
-            $this->width = $this->file ? $this->file->getType() : null;
+            $this->width = $this->file ? $this->file->getWidth() : null;
         }
         return $this->width;
     }    
