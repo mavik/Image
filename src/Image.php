@@ -141,24 +141,30 @@ class Image
     public function save(string $path): Image
     {
         $this->getGraphicLibrary()->save($this->getResource(), $path, $this->getType());
+        return $this;
     }
     
     private function getGraphicLibrary(): GraphicLibraryInterface
     {
         if (!isset($this->graphicLibrary)) {
             foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
-                $className = 'Graphiclibrary\\' . ucfirst(strtolower($libraryName));
-                if (class_exists($className) && $className::isInstalled()) {
+                $className = 'Mavik\\Image\\GraphicLibrary\\' . ucfirst(strtolower($libraryName));
+                if (class_exists($className, true) && $className::isInstalled()) {
                     $this->graphicLibrary = new $className(self::$configuration['graphic_library']);
                     break;
                 }
+            }
+            if (!isset($this->graphicLibrary)) {
                 throw new Exception\ConfigurationException('Configuration error: None of the required graphics libraries are installed.');
             }
         }
         return $this->graphicLibrary;
     }
     
-    private function getResource(): mix
+    /**
+     * @return mix Depends on graphic library
+     */
+    private function getResource()
     {
         if (!isset($this->resource)) {
             $this->resource = $this->getGraphicLibrary()->open(

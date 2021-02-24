@@ -20,10 +20,10 @@ class Gmagick implements GraphicLibraryInterface
     ];
     
     const TYPES = [
-        IMG_JPG => 'JPG',
-        IMG_PNG => 'PNG',
-        IMG_GIF => 'GIF',
-        IMG_WEBP => 'WebP'
+        IMAGETYPE_JPEG => 'JPG',
+        IMAGETYPE_PNG => 'PNG',
+        IMAGETYPE_GIF => 'GIF',
+        IMAGETYPE_WEBP => 'WebP'
     ];
 
     private $configuration = [];
@@ -38,7 +38,18 @@ class Gmagick implements GraphicLibraryInterface
         return class_exists('Gmagick');
     }
     
-    public function save(\Gmagick $resource, string $path, int $type)
+    public function open(string $fileName, int $type)
+    {
+        return new \Gmagick($fileName);
+    }    
+    
+    /**
+     * @param \Gmagick $resource
+     * @param string $path
+     * @param int $type
+     * @throws GraphicLibraryException
+     */
+    public function save($resource, string $path, int $type): void
     {
         if (!$resource->setimageformat(self::TYPES[$type])) {
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");

@@ -20,10 +20,10 @@ class Imagick implements GraphicLibraryInterface
     ];
     
     const TYPES = [
-        IMG_JPG => 'JPG',
-        IMG_PNG => 'PNG',
-        IMG_GIF => 'GIF',
-        IMG_WEBP => 'WebP'
+        IMAGETYPE_JPEG => 'JPG',
+        IMAGETYPE_PNG => 'PNG',
+        IMAGETYPE_GIF => 'GIF',
+        IMAGETYPE_WEBP => 'WebP'
     ];    
 
     private $configuration = [];
@@ -38,7 +38,19 @@ class Imagick implements GraphicLibraryInterface
         return class_exists('Imagick');
     }
     
-    public function save(\Imagick $resource, string $path, int $type): void
+    public function open(string $fileName, int $type)
+    {
+        return new \Imagick($fileName);
+    }
+
+    /**
+     * @param \Imagick $resource
+     * @param string $path
+     * @param int $type
+     * @return void
+     * @throws GraphicLibraryException
+     */
+    public function save($resource, string $path, int $type): void
     {
         if(!$resource->setFormat(self::TYPES[$type])) {
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");

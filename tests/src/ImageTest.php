@@ -65,8 +65,49 @@ class ImageTest extends TestCase
     {
         $image = new Image($src);
         $this->assertEquals($info['file_size'], $image->getFileSize());
-    }    
+    }
     
+    /**
+     * @covers Image::save
+     * @dataProvider imagesToSave
+     */
+    public function testSave(string $origFile)
+    {    
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+        $image = new Image($origFile);
+        $image->save($savedFile);                        
+        $this->assertLessThan(1, $this->compareImages($origFile, $savedFile));        
+        unlink($savedFile);
+    }
+    
+    private function compareImages(string $image1, string $image2): int
+    {       
+        $ch = curl_init('https://api.deepai.org/api/image-similarity');
+        $cfile1 = new \CURLFile($image1);
+        $cfile2 = new \CURLFile($image2);
+        $data = [
+            'image1' => $cfile1,
+            'image2' => $cfile2,            
+        ];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['api-key:8c6c6720-752f-4233-98ef-930769dcc61f']); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        $response = curl_exec($ch);
+        $result = json_decode($response);
+        return $result->output->distance;
+    }
+
+    public function imagesToSave()
+    {
+        return [
+            __DIR__ . '/../resources/images/apple.jpg',
+            __DIR__ . '/../resources/images/butterfly_with_transparent_bg.png',
+            __DIR__ . '/../resources/images/snowman-pixel.gif',
+            __DIR__ . '/../resources/images/house.webp',
+        ];
+    }
+
     public function files()
     {
         return [

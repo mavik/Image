@@ -32,19 +32,36 @@ class Gd2 implements GraphicLibraryInterface
         return function_exists('imagecreatetruecolor');
     }
     
-    public function save($resource, string $path, int $type)
+    public function open(string $fileName, int $type)
+    {
+        switch ($type)
+        {
+            case IMAGETYPE_JPEG:
+                return imagecreatefromjpeg($fileName);
+            case IMAGETYPE_PNG:
+                return imagecreatefrompng($fileName);
+            case IMAGETYPE_GIF:
+                return imagecreatefromgif($fileName);
+            case IMAGETYPE_WEBP:
+                return imagecreatefromwebp($fileName);
+            default:
+                throw new GraphicLibraryException("Unsupported type of image {$type}");
+        }
+    }
+
+    public function save($resource, string $path, int $type): void
     {
         switch ($type) {
-            case IMG_JPG:
+            case IMAGETYPE_JPEG:
                 $result = imagejpeg($resource, $path, $this->configuration['jpg_quality']);
                 break;
-            case IMG_PNG:
-                $result = imagepng($image, $path, $type);
+            case IMAGETYPE_PNG:
+                $result = imagepng($resource, $path, $type);
                 break;
-            case IMG_GIF:
+            case IMAGETYPE_GIF:
                 $result = imagegif($resource, $path);
                 break;
-            case IMG_WEBP:
+            case IMAGETYPE_WEBP:
                 $result = imagewebp($resource, $path, $this->configuration['webp_quality']);
             default :
                 $result = false;
@@ -52,6 +69,5 @@ class Gd2 implements GraphicLibraryInterface
         if (!$result) {
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");
         }
-    }
-
+    }    
 }
