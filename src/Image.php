@@ -59,12 +59,12 @@ class Image
     }
 
     /**
-     * @param string $fileName Path or URL
+     * @param string $src Path or URL
      */
-    public function __construct(string $fileName = null)
+    public function __construct(string $src = null)
     {        
-        if (!empty($fileName)) {
-            $this->open($fileName);
+        if (!empty($src)) {
+            $this->open($src);
         }
     }
     
@@ -80,11 +80,11 @@ class Image
     /**
      * Static constructor
      * 
-     * @param string $fileName Path or URL
+     * @param string $src Path or URL
      */
-    public static function make(string $fileName): Image
+    public static function make(string $src): Image
     {
-        return new self($fileName);
+        return new self($src);
     }
     
     /**
