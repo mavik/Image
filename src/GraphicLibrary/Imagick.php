@@ -52,8 +52,8 @@ class Imagick implements GraphicLibraryInterface
      */
     public function save($resource, string $path, int $type): void
     {
-        if(!$resource->setFormat(self::TYPES[$type])) {
-            throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");
+        if(!$resource->setImageFormat(self::TYPES[$type])) {
+            throw new GraphicLibraryException('Format ' . self::TYPES[$type] . ' is not supported be Imagick.');
         }
         $resource->writeImage($path);
     }
