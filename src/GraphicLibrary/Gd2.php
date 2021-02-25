@@ -22,7 +22,7 @@ class Gd2 implements GraphicLibraryInterface
 
     private $configuration = [];
 
-    public function __constuct(array $configuration)
+    public function __construct(array $configuration = [])
     {
         $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
     }
@@ -32,23 +32,36 @@ class Gd2 implements GraphicLibraryInterface
         return function_exists('imagecreatetruecolor');
     }
     
-    public function open(string $fileName, int $type)
+    /**
+     * @param string $src
+     * @param int $type IMAGETYPE_XXX
+     * @return recource
+     * @throws GraphicLibraryException
+     */
+    public function open(string $src, int $type)
     {
         switch ($type)
         {
             case IMAGETYPE_JPEG:
-                return imagecreatefromjpeg($fileName);
+                return imagecreatefromjpeg($src);
             case IMAGETYPE_PNG:
-                return imagecreatefrompng($fileName);
+                return imagecreatefrompng($src);
             case IMAGETYPE_GIF:
-                return imagecreatefromgif($fileName);
+                return imagecreatefromgif($src);
             case IMAGETYPE_WEBP:
-                return imagecreatefromwebp($fileName);
+                return imagecreatefromwebp($src);
             default:
-                throw new GraphicLibraryException("Unsupported type of image {$type}");
+                throw new GraphicLibraryException('Trying to open unsupported type of image ' . image_type_to_mime_type($type));
         }
     }
 
+    /**
+     * @param resource $resource
+     * @param string $path
+     * @param int $type IMAGETYPE_XXX
+     * @return void
+     * @throws GraphicLibraryException
+     */
     public function save($resource, string $path, int $type): void
     {
         switch ($type) {
@@ -63,8 +76,9 @@ class Gd2 implements GraphicLibraryInterface
                 break;
             case IMAGETYPE_WEBP:
                 $result = imagewebp($resource, $path, $this->configuration['webp_quality']);
+                break;
             default :
-                $result = false;
+                throw new GraphicLibraryException('Trying to save unsupported type of image ' . image_type_to_mime_type($type));
         }        
         if (!$result) {
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");

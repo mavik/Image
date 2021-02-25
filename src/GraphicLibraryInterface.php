@@ -11,7 +11,7 @@ namespace Mavik\Image;
 
 interface GraphicLibraryInterface
 {
-    public function __constuct(array $configuration);
+    public function __construct(array $configuration = []);
 
     public static function isInstalled(): bool;
 
