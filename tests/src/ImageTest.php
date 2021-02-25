@@ -12,6 +12,7 @@ namespace Mavik\Image;
 
 use PHPUnit\Framework\TestCase;
 use Mavik\Image\Tests\HttpServer;
+use Mavik\Image\Tests\CompareImages;
 
 class ImageTest extends TestCase
 {
@@ -76,35 +77,16 @@ class ImageTest extends TestCase
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         $image = new Image($origFile);
         $image->save($savedFile);                        
-        $this->assertLessThan(1, $this->compareImages($origFile, $savedFile));        
+        $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
         unlink($savedFile);
     }
     
-    private function compareImages(string $image1, string $image2): int
-    {       
-        $ch = curl_init('https://api.deepai.org/api/image-similarity');
-        $cfile1 = new \CURLFile($image1);
-        $cfile2 = new \CURLFile($image2);
-        $data = [
-            'image1' => $cfile1,
-            'image2' => $cfile2,            
-        ];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['api-key:8c6c6720-752f-4233-98ef-930769dcc61f']); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        $response = curl_exec($ch);
-        $result = json_decode($response);
-        return $result->output->distance;
-    }
-
     public function imagesToSave()
     {
         return [
-            __DIR__ . '/../resources/images/apple.jpg',
-            __DIR__ . '/../resources/images/butterfly_with_transparent_bg.png',
-            __DIR__ . '/../resources/images/snowman-pixel.gif',
-            __DIR__ . '/../resources/images/house.webp',
+            0 => [__DIR__ . '/../resources/images/apple.jpg'],
+            1 => [__DIR__ . '/../resources/images/butterfly_with_transparent_bg.png'],
+            2 => [__DIR__ . '/../resources/images/snowman-pixel.gif'],
         ];
     }
 
