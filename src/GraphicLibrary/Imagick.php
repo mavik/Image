@@ -28,7 +28,7 @@ class Imagick implements GraphicLibraryInterface
 
     private $configuration = [];
 
-    public function __constuct(array $configuration)
+    public function __construct(array $configuration = [])
     {
         $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
     }
@@ -38,15 +38,20 @@ class Imagick implements GraphicLibraryInterface
         return class_exists('Imagick');
     }
     
-    public function open(string $fileName, int $type)
+    /**
+     * @param string $src
+     * @param int $type IMAGETYPE_XXX
+     * @return \Imagick
+     */
+    public function open(string $src, int $type)
     {
-        return new \Imagick($fileName);
+        return new \Imagick($src);
     }
 
     /**
      * @param \Imagick $resource
      * @param string $path
-     * @param int $type
+     * @param int $type IMAGETYPE_XXX
      * @return void
      * @throws GraphicLibraryException
      */
