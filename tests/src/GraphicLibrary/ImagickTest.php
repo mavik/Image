@@ -47,6 +47,26 @@ class ImagickTest extends TestCase
         unlink($savedFile);
     }
 
+    public function testCrop()
+    {
+        $src = __DIR__ . '/../../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../../temp/' . basename($src);
+        $expectedFile = __DIR__ . '/../../resources/images/apple-crop-25-40-800-900.jpg';
+        
+        $imagick = new Imagick();
+        $resource = $imagick->open($src, IMAGETYPE_JPEG);
+        $resource = $imagick->crop($resource, 25, 40, 800, 900);
+        $imagick->save($resource, $savedFile, IMAGETYPE_JPEG);
+        
+        $imageSize = getimagesize($savedFile);
+        $this->assertEquals(800, $imageSize[0]);
+        $this->assertEquals(900, $imageSize[1]);
+        $this->assertEquals(IMAGETYPE_JPEG, $imageSize[2]);
+        
+        $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
+        unlink($savedFile);        
+    }    
+    
     public function imagesToOpen()
     {
         return [
