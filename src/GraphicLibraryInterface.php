@@ -33,4 +33,34 @@ interface GraphicLibraryInterface
      * @return void
      */
     public function save($resource, string $path, int $type): void;
+
+    /**
+     * @param mix $resource Depends on graphic library
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function crop($resource, int $x, int $y, int $width, int $height): void;
+    
+    /**
+     * @param mix $resource Depends on graphic library
+     * @param int $origX 
+     * @param int $origY
+     * @param int $origWidth
+     * @param int $origHeight
+     * @param int $widht
+     * @param int $height
+     * @return void
+     */
+//    public function resize(
+//        $resource, 
+//        int $origX, 
+//        int $origY, 
+//        int $origWidth, 
+//        int $origHeight, 
+//        int $widht, 
+//        int $height
+//    ): void;
 }
