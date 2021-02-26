@@ -63,4 +63,18 @@ class Imagick implements GraphicLibraryInterface
         $resource->writeImage($path);
     }
     
+    /**
+     * @param \Imagick $resource
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @return \Imagick
+     */
+    public function crop($resource, int $x, int $y, int $width, int $height)
+    {
+        $resource->cropImage($width, $height, $x, $y);
+        return $resource;
+    }
+
 }
