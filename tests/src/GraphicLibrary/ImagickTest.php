@@ -54,6 +54,7 @@ class ImagickTest extends TestCase
             1 => [__DIR__ . '/../../resources/images/butterfly_with_transparent_bg.png', IMAGETYPE_PNG],
             2 => [__DIR__ . '/../../resources/images/snowman-pixel.gif', IMAGETYPE_GIF],
             3 => ['http://localhost:8888/apple.jpg', IMAGETYPE_JPEG],
+	        4 => ['https://upload.wikimedia.org/wikipedia/en/a/a7/Culinary_fruits_cropped_top_view.jpg', IMAGETYPE_JPEG],
         ];
     }
     
@@ -63,7 +64,6 @@ class ImagickTest extends TestCase
             0 => [__DIR__ . '/../../resources/images/apple.jpg', IMAGETYPE_JPEG],
             1 => [__DIR__ . '/../../resources/images/butterfly_with_transparent_bg.png', IMAGETYPE_PNG],
             2 => [__DIR__ . '/../../resources/images/snowman-pixel.gif', IMAGETYPE_GIF],
-            3 => ['https://upload.wikimedia.org/wikipedia/en/a/a7/Culinary_fruits_cropped_top_view.jpg', IMAGETYPE_JPEG],
         ];
     }    
 }
