@@ -28,7 +28,7 @@ class Gmagick implements GraphicLibraryInterface
 
     private $configuration = [];
 
-    public function __constuct(array $configuration)
+    public function __construct(array $configuration = [])
     {
         $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
     }
@@ -38,15 +38,34 @@ class Gmagick implements GraphicLibraryInterface
         return class_exists('Gmagick');
     }
     
-    public function open(string $fileName, int $type)
+    /**
+     * @param string $src
+     * @param int $type IMAGETYPE_XXX
+     * @return \Gmagick
+     */
+    public function open(string $src, int $type)
     {
-        return new \Gmagick($fileName);
+        /**
+         * We cannot use
+         * return new \Gmagick($src);
+         * because Gmagick doesn't support wrappers (https://, ftp:// itp.)
+         * 
+         * We cannot use
+         * $fp = fopen($src, 'rb');
+         * $image = new \Gmagick();
+         * return $image->readimagefile($fp);
+         * because it causes Segmentation fault.
+         * 
+         * Only that works correct.
+         */ 
+        $image = new \Gmagick();
+        return $image->readimageblob(file_get_contents($src));
     }    
     
     /**
      * @param \Gmagick $resource
      * @param string $path
-     * @param int $type
+     * @param int $type IMAGETYPE_XXX
      * @throws GraphicLibraryException
      */
     public function save($resource, string $path, int $type): void
