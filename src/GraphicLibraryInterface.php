@@ -40,9 +40,9 @@ interface GraphicLibraryInterface
      * @param int $y
      * @param int $width
      * @param int $height
-     * @return void
+     * @return mix Resource or object. it depends on graphic library
      */
-    public function crop($resource, int $x, int $y, int $width, int $height): void;
+    public function crop($resource, int $x, int $y, int $width, int $height);
     
     /**
      * @param mix $resource Depends on graphic library

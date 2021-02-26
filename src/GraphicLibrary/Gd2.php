@@ -83,5 +83,25 @@ class Gd2 implements GraphicLibraryInterface
         if (!$result) {
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");
         }
-    }    
+    }   
+    
+    /**
+     * @param resource $resource
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @return resource
+     */
+    public function crop($resource, int $x, int $y, int $width, int $height)
+    {
+        $newResource = imagecrop($resource, [
+            'x' => $x,
+            'y' => $y,
+            'width' => $width,
+            'height' => $height
+        ]);
+        imagedestroy($resource);
+        return $newResource;
+    }
 }
