@@ -40,11 +40,31 @@ class Gd2Test extends TestCase
     public function testSave(string $src, int $type)
     {
         $savedFile = __DIR__ . '/../../temp/' . basename($src);
-        $gd2 = new Gd2();    
+        $gd2 = new Gd2();
         $resource = $gd2->open($src, $type);
         $gd2->save($resource, $savedFile, $type);
         $this->assertLessThan(1, CompareImages::distance($savedFile, $src));
         unlink($savedFile);
+    }
+    
+    public function testCrop()
+    {
+        $src = __DIR__ . '/../../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../../temp/' . basename($src);
+        $expectedFile = __DIR__ . '/../../resources/images/apple-crop-25-40-800-900.jpg';
+        
+        $gd2 = new Gd2();
+        $resource = $gd2->open($src, IMAGETYPE_JPEG);
+        $resource = $gd2->crop($resource, 25, 40, 800, 900);
+        $gd2->save($resource, $savedFile, IMAGETYPE_JPEG);
+        
+        $imageSize = getimagesize($savedFile);
+        $this->assertEquals(800, $imageSize[0]);
+        $this->assertEquals(900, $imageSize[1]);
+        $this->assertEquals(IMAGETYPE_JPEG, $imageSize[2]);
+        
+        $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
+        unlink($savedFile);        
     }
     
     public function imagesToOpen()
