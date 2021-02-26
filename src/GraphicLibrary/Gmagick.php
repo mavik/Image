@@ -75,4 +75,18 @@ class Gmagick implements GraphicLibraryInterface
         }
         $resource->writeimage($path);
     }
+    
+    /**
+     * @param \Gmagick $resource
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @return \Gmagick
+     */
+    public function crop($resource, int $x, int $y, int $width, int $height)
+    {
+        $resource->cropImage($width, $height, $x, $y);
+        return $resource;
+    }    
 }
