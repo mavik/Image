@@ -28,6 +28,10 @@ class GmagickTest extends TestCase
      */
     public function testOpen(string $src, int $type)
     {
+        if (!extension_loaded('gmagick')) {
+            $this->markTestSkipped('Gmagick is not loaded.');
+            return;
+        }
         $gmagick = new Gmagick();
         $resource = $gmagick->open($src, $type);
         $this->assertInstanceOf('Gmagick', $resource);
@@ -39,6 +43,10 @@ class GmagickTest extends TestCase
      */
     public function testSave(string $src, int $type)
     {
+        if (!extension_loaded('gmagick')) {
+            $this->markTestSkipped('Gmagick is not loaded.');
+            return;
+        }
         $savedFile = __DIR__ . '/../../temp/' . basename($src);
         $gmagick = new Gmagick();
         $resource = $gmagick->open($src, $type);
@@ -49,6 +57,10 @@ class GmagickTest extends TestCase
 
     public function testCrop()
     {
+        if (!extension_loaded('gmagick')) {
+            $this->markTestSkipped('Gmagick is not loaded.');
+            return;
+        }
         $src = __DIR__ . '/../../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../../temp/' . basename($src);
         $expectedFile = __DIR__ . '/../../resources/images/apple-crop-25-40-800-900.jpg';
