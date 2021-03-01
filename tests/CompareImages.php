@@ -21,6 +21,6 @@ class CompareImages
                 return round($matches[1] * 100);
             }
         }
-        throw new Exception("Images '{$image1}' and '{$image2}' cannot be compared.");
+        throw new \Exception("Images '{$image1}' and '{$image2}' cannot be compared.");
     }
 }
