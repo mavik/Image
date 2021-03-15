@@ -21,6 +21,9 @@ class Gd2 implements GraphicLibraryInterface
     ];
 
     private $configuration = [];
+    
+    /** @var int IMAGETYPE_XXX */
+    private $imageType;
 
     public function __construct(array $configuration = [])
     {
@@ -40,6 +43,7 @@ class Gd2 implements GraphicLibraryInterface
      */
     public function open(string $src, int $type)
     {
+        $this->imageType = $type;
         switch ($type)
         {
             case IMAGETYPE_JPEG:
@@ -103,5 +107,90 @@ class Gd2 implements GraphicLibraryInterface
         ]);
         imagedestroy($resource);
         return $newResource;
+    }
+    
+    /**
+     * @param resource $resource
+     * @param int $widht
+     * @param int $height
+     * @return resource
+     */
+    public function resize($resource, int $width, int $height)
+    {
+        return $this->cropAndResize($resource, 0, 0, imagesx($resource), imagesy($resource), $width, $height);
+    }
+
+    /**
+     * @param resource $resource
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @param int $toWidth
+     * @param int $toHeight
+     * @return resource
+     */
+    private function cropAndResize($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    {
+        if (imagecolorstotal($resource)) {
+            return $this->cropAndResizeIndexedColors($resource, $x, $y, $width, $height, $toWidth, $toHeight);
+        } else {
+            return $this->cropAndResizeTrueColors($resource, $x, $y, $width, $height, $toWidth, $toHeight);
+        }
+    }
+    
+    /**
+     * @param resource $resource
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @param int $toWidth
+     * @param int $toHeight
+     * @return resource
+     */
+    private function cropAndResizeTrueColors($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    {
+        $newResource = imagecreatetruecolor($toWidth, $toHeight);
+        if ($this->imageType != IMAGETYPE_JPEG) {
+            imagealphablending($newResource, false);
+            imagesavealpha($newResource, true);
+            $transparent = imagecolorallocatealpha($newResource, 255, 255, 255, 127);
+            imagefilledrectangle($newResource, 0, 0, $width, $height, $transparent);
+        }
+        imagecopyresampled($newResource, $resource, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
+        imagedestroy($resource);
+        return $newResource;
+    }
+    
+    /**
+     * @param resource $resource
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @param int $toWidth
+     * @param int $toHeight
+     * @return resource
+     */
+    private function cropAndResizeIndexedColors($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    {
+        $newResource = imagecreatetruecolor($toWidth, $toHeight);
+        
+        $transparentIndex = imagecolortransparent($resource);
+        if ($transparentIndex >= 0) {
+            $transparentRgb = imagecolorsforindex($resource, $transparentIndex);
+            $newTransparentIndex = imagecolorexact($newResource, $transparentRgb['red'], $transparentRgb['green'], $transparentRgb['blue']);
+            imagefilledrectangle($newResource, 0, 0, $width, $height, $newTransparentIndex);
+            imagecolortransparent($newResource, $newTransparentIndex);
+        }
+        
+        imagecopyresized($newResource, $resource, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
+        
+        $colorNumbers = imagecolorstotal($resource);
+        imagetruecolortopalette($newResource, false, $colorNumbers);
+        
+        imagedestroy($resource);
+        return $newResource;        
     }
 }
