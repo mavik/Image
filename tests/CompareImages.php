@@ -14,7 +14,7 @@ class CompareImages
 {
     public static function distance(string $image1, string $image2): int
     {
-        exec("gm compare -metric MSE {$image1} {$image2}", $output);
+        exec("gm compare -metric MSE \"{$image1}\" \"{$image2}\"", $output);
         foreach ($output as $line) {
             preg_match('/Total:\s+(0\.\d+)\s+\d+\.\d+/', $line, $matches);
             if (!empty($matches)) {
