@@ -99,14 +99,18 @@ class Gd2 implements GraphicLibraryInterface
      */
     public function crop($resource, int $x, int $y, int $width, int $height)
     {
-        $newResource = imagecrop($resource, [
-            'x' => $x,
-            'y' => $y,
-            'width' => $width,
-            'height' => $height
-        ]);
-        imagedestroy($resource);
-        return $newResource;
+        if ($this->imageType == IMAGETYPE_JPEG || $this->imageType == IMAGETYPE_WBMP) {
+            $newResource = imagecrop($resource, [
+                'x' => $x,
+                'y' => $y,
+                'width' => $width,
+                'height' => $height
+            ]);            
+            imagedestroy($resource);
+            return $newResource;
+        } else {        
+            return $this->cropAndResize($resource, $x, $y, $width, $height, $width, $height);
+        }        
     }
     
     /**
