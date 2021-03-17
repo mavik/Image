@@ -27,6 +27,9 @@ class Imagick implements GraphicLibraryInterface
     ];    
 
     private $configuration = [];
+    
+    /** @var int */
+    private $type;
 
     public function __construct(array $configuration = [])
     {
@@ -45,6 +48,7 @@ class Imagick implements GraphicLibraryInterface
      */
     public function open(string $src, int $type)
     {
+        $this->type = $type;
         return new \Imagick($src);
     }
 
@@ -73,7 +77,11 @@ class Imagick implements GraphicLibraryInterface
      */
     public function crop($resource, int $x, int $y, int $width, int $height)
     {
-        $resource->cropImage($width, $height, $x, $y);
+        $resource->cropImage($width, $height, $x, $y);        
+        /** Fix incorrect size of cropped gif */
+        if ($this->type == IMAGETYPE_GIF) {
+            $resource->setImagePage($width, $height, 0, 0);
+        }        
         return $resource;
     }
 
