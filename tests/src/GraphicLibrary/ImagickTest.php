@@ -77,8 +77,34 @@ class ImagickTest extends TestCase
         
         $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
         unlink($savedFile);        
-    }    
+    }
     
+    /**
+     * @covers Mavik\Image\GraphicLibrary\Imagick::resize
+     * @dataProvider imagesToResize
+     */
+    public function testResize(int $imgType, int $width, int $height, string $src, string $expectedFile)
+    {
+        if (!extension_loaded('imagick')) {
+            $this->markTestSkipped('Imagick is not loaded.');
+            return;
+        }        
+        $savedFile = __DIR__ . '/../../temp/' . basename($src);
+
+        $graphicLib = new Imagick();
+        $image = $graphicLib->open($src, $imgType);
+        $image = $graphicLib->resize($image, $width, $height);
+        $graphicLib->save($image, $savedFile, $imgType);
+        
+        $imageSize = getimagesize($savedFile);
+        $this->assertEquals($width, $imageSize[0]);
+        $this->assertEquals($height, $imageSize[1]);
+        $this->assertEquals($imgType, $imageSize[2]);
+        
+        $this->assertLessThan(2, CompareImages::distance($expectedFile, $savedFile));
+        unlink($savedFile);
+    }
+        
     public function imagesToOpen()
     {
         return [
@@ -96,6 +122,37 @@ class ImagickTest extends TestCase
             0 => [__DIR__ . '/../../resources/images/apple.jpg', IMAGETYPE_JPEG],
             1 => [__DIR__ . '/../../resources/images/butterfly_with_transparent_bg.png', IMAGETYPE_PNG],
             2 => [__DIR__ . '/../../resources/images/snowman-pixel.gif', IMAGETYPE_GIF],
+        ];
+    }
+    
+    public function imagesToResize()
+    {
+        return [
+            0 => [
+                IMAGETYPE_JPEG, 400, 500,
+                __DIR__ . '/../../resources/images/apple.jpg',
+                __DIR__ . '/../../resources/images/resized/apple-400-500.jpg'
+            ],
+            1 => [ 
+                IMAGETYPE_PNG, 300, 281,
+                __DIR__ . '/../../resources/images/butterfly_with_transparent_bg.png',
+                __DIR__ . '/../../resources/images/resized/butterfly_with_transparent_bg-300-281.png'
+            ],
+            2 => [
+                IMAGETYPE_GIF, 200, 226,
+                __DIR__ . '/../../resources/images/bee.gif',
+                __DIR__ . '/../../resources/images/resized/bee-200-226.gif'
+            ],
+            3 => [ 
+                IMAGETYPE_GIF, 300, 281,
+                __DIR__ . '/../../resources/images/butterfly_with_transparent_bg.gif',
+                __DIR__ . '/../../resources/images/resized/butterfly_with_transparent_bg-300-281.gif'
+            ],
+            4 => [
+                IMAGETYPE_WEBP, 300, 281,
+                __DIR__ . '/../../resources/images/butterfly_with_transparent_bg.webp',
+                __DIR__ . '/../../resources/images/resized/butterfly_with_transparent_bg.webp'
+            ],
         ];
     }    
 }
