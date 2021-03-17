@@ -66,7 +66,7 @@ class Gd2Test extends TestCase
         $this->assertEquals($imgType, $imageSize[2]);
         
         $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
-        //unlink($savedFile);
+        unlink($savedFile);
     }
     
     /**
