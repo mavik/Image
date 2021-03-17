@@ -77,4 +77,14 @@ class Imagick implements GraphicLibraryInterface
         return $resource;
     }
 
+    /**
+     * @param \Imagick $resource
+     * @param int $width
+     * @param int $height
+     * @return \Imagick
+     */
+    public function resize($resource, int $width, int $height): \Mavik\Image\mix
+    {
+        return $resource->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1); 
+    }
 }
