@@ -20,18 +20,20 @@ class ImagickTest extends TestCase
     {
         $webRoot = __DIR__ . '/../../resources/images';
         HttpServer::start($webRoot);
-    }    
-        
+    }
+    
+    protected function setUp(): void
+    {
+   
+    }
+
+    
     /**
      * @covers Mavik\Image\GraphicLibrary\Imagick::open
      * @dataProvider imagesToOpen
      */
     public function testOpen(string $src, int $type)
     {
-        if (!extension_loaded('imagick')) {
-            $this->markTestSkipped('Imagick is not loaded.');
-            return;
-        }
         $imagick = new Imagick();
         $resource = $imagick->open($src, $type);
         $this->assertInstanceOf('Imagick', $resource);
@@ -55,30 +57,31 @@ class ImagickTest extends TestCase
         unlink($savedFile);
     }
 
-    public function testCrop()
+    /**
+     * @covers Mavik\Image\GraphicLibrary\Imagick::crop
+     * @dataProvider imagesToCrop
+     */
+    public function testCrop(int $imgType, int $x, int $y, int $width, int $height, string $src, string $expectedFile)
     {
         if (!extension_loaded('imagick')) {
             $this->markTestSkipped('Imagick is not loaded.');
             return;
         }
-        $src = __DIR__ . '/../../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../../temp/' . basename($src);
-        $expectedFile = __DIR__ . '/../../resources/images/apple-crop-25-40-800-900.jpg';
         
-        $imagick = new Imagick();
-        $resource = $imagick->open($src, IMAGETYPE_JPEG);
-        $resource = $imagick->crop($resource, 25, 40, 800, 900);
-        $imagick->save($resource, $savedFile, IMAGETYPE_JPEG);
+        $graphiLib = new Imagick();
+        $resource = $graphiLib->open($src, $imgType);
+        $resource = $graphiLib->crop($resource, $x, $y, $width, $height);
+        $graphiLib->save($resource, $savedFile, $imgType);
         
         $imageSize = getimagesize($savedFile);
-        $this->assertEquals(800, $imageSize[0]);
-        $this->assertEquals(900, $imageSize[1]);
-        $this->assertEquals(IMAGETYPE_JPEG, $imageSize[2]);
+        $this->assertEquals($width, $imageSize[0]);
+        $this->assertEquals($height, $imageSize[1]);
+        $this->assertEquals($imgType, $imageSize[2]);
         
         $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
-        unlink($savedFile);        
-    }
-    
+        unlink($savedFile);
+    }    
     /**
      * @covers Mavik\Image\GraphicLibrary\Imagick::resize
      * @dataProvider imagesToResize
@@ -88,7 +91,7 @@ class ImagickTest extends TestCase
         if (!extension_loaded('imagick')) {
             $this->markTestSkipped('Imagick is not loaded.');
             return;
-        }        
+        }
         $savedFile = __DIR__ . '/../../temp/' . basename($src);
 
         $graphicLib = new Imagick();
@@ -125,6 +128,37 @@ class ImagickTest extends TestCase
         ];
     }
     
+    public function imagesToCrop()
+    {
+        return [
+            0 => [
+                IMAGETYPE_JPEG, 25, 40, 400, 500,
+                __DIR__ . '/../../resources/images/apple.jpg',
+                __DIR__ . '/../../resources/images/crop/apple-25-40-400-500.jpg'
+            ],
+            1 => [ 
+                IMAGETYPE_PNG, 250, 300, 500, 600,
+                __DIR__ . '/../../resources/images/butterfly_with_transparent_bg.png',
+                __DIR__ . '/../../resources/images/crop/butterfly_with_transparent_bg-250-300-500-600.png'
+            ],
+            2 => [
+                IMAGETYPE_GIF, 200, 250, 300, 281,
+                __DIR__ . '/../../resources/images/bee.gif',
+                __DIR__ . '/../../resources/images/crop/bee-200-250-300-281.gif'
+            ],
+            3 => [ 
+                IMAGETYPE_GIF, 300, 250, 600, 500,
+                __DIR__ . '/../../resources/images/butterfly_with_transparent_bg.gif',
+                __DIR__ . '/../../resources/images/crop/butterfly_with_transparent_bg-300-250-600-500.gif'
+            ],
+//            4 => [
+//                IMAGETYPE_WEBP, 280, 320, 400, 500,
+//                __DIR__ . '/../../resources/images/butterfly_with_transparent_bg.webp',
+//                __DIR__ . '/../../resources/images/crop/butterfly_with_transparent_bg-280-20-400-500.webp'
+//            ],
+        ];
+    }
+        
     public function imagesToResize()
     {
         return [
