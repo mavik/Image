@@ -10,6 +10,7 @@
 namespace Mavik\Image\GraphicLibrary;
 
 use Mavik\Image\GraphicLibraryInterface;
+use Mavik\Image\Exception\GraphicLibraryException;
 
 class Imagick implements GraphicLibraryInterface
 {
@@ -90,9 +91,13 @@ class Imagick implements GraphicLibraryInterface
      * @param int $width
      * @param int $height
      * @return \Imagick
+     * @throws GraphicLibraryException
      */
-    public function resize($resource, int $width, int $height): \Mavik\Image\mix
+    public function resize($resource, int $width, int $height)
     {
-        return $resource->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1); 
+        if (!$resource->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1)) {
+            throw new GraphicLibraryException("Imagick: Image cannot be resized.");
+        }
+        return $resource;
     }
 }
