@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  *  PHP Library for Image processing and creating thumbnails
  *  
  *  @package Mavik\Image
@@ -7,91 +7,11 @@
  *  @copyright 2021 Vitalii Marenkov
  *  @license MIT; see LICENSE
  */
+namespace Mavik\Image\Tests\Unit\GraphicLibrary;
 
-namespace Mavik\Image\GraphicLibrary;
-
-use PHPUnit\Framework\TestCase;
-use Mavik\Image\Tests\HttpServer;
-use Mavik\Image\Tests\CompareImages;
-
-class Gd2Test extends TestCase
+class DataProvider
 {
-    public static function setUpBeforeClass(): void
-    {
-        $webRoot = __DIR__ . '/../../resources/images';
-        HttpServer::start($webRoot);
-    }    
-        
-    /**
-     * @covers Mavik\Image\GraphicLibrary\Gd2::open
-     * @dataProvider imagesToOpen
-     */
-    public function testOpen(string $src, int $type)
-    {
-        $gd2 = new Gd2();
-        $resource = $gd2->open($src, $type);
-        $this->assertIsResource($resource);
-    }
-    
-    /**
-     * @covers Mavik\Image\GraphicLibrary\Gd2::save
-     * @dataProvider imagesToSave
-     */
-    public function testSave(string $src, int $type)
-    {
-        $savedFile = __DIR__ . '/../../temp/' . basename($src);
-        $gd2 = new Gd2();
-        $resource = $gd2->open($src, $type);
-        $gd2->save($resource, $savedFile, $type);
-        $this->assertLessThan(1, CompareImages::distance($savedFile, $src));
-        unlink($savedFile);
-    }
-    
-    /**
-     * @covers Mavik\Image\GraphicLibrary\Gd2::crop
-     * @dataProvider imagesToCrop
-     */
-    public function testCrop(int $imgType, int $x, int $y, int $width, int $height, string $src, string $expectedFile)
-    {
-        $savedFile = __DIR__ . '/../../temp/' . basename($src);
-        
-        $gd2 = new Gd2();
-        $resource = $gd2->open($src, $imgType);
-        $resource = $gd2->crop($resource, $x, $y, $width, $height);
-        $gd2->save($resource, $savedFile, $imgType);
-        
-        $imageSize = getimagesize($savedFile);
-        $this->assertEquals($width, $imageSize[0]);
-        $this->assertEquals($height, $imageSize[1]);
-        $this->assertEquals($imgType, $imageSize[2]);
-        
-        $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
-        unlink($savedFile);
-    }
-    
-    /**
-     * @covers Mavik\Image\GraphicLibrary\Gd2::resize
-     * @dataProvider imagesToResize
-     */
-    public function testResize(int $imgType, int $width, int $height, string $src, string $expectedFile)
-    {
-        $savedFile = __DIR__ . '/../../temp/' . basename($src);
-
-        $gd2 = new Gd2();
-        $resource = $gd2->open($src, $imgType);
-        $resource = $gd2->resize($resource, $width, $height);
-        $gd2->save($resource, $savedFile, $imgType);
-        
-        $imageSize = getimagesize($savedFile);
-        $this->assertEquals($width, $imageSize[0]);
-        $this->assertEquals($height, $imageSize[1]);
-        $this->assertEquals($imgType, $imageSize[2]);
-        
-        $this->assertLessThan(2, CompareImages::distance($expectedFile, $savedFile));
-        unlink($savedFile);
-    }
-
-    public function imagesToOpen()
+    public static function imagesToOpen()
     {
         return [
             0 => [__DIR__ . '/../../resources/images/apple.jpg', IMAGETYPE_JPEG],
@@ -103,7 +23,7 @@ class Gd2Test extends TestCase
         ];
     }
     
-    public function imagesToSave()
+    public static function imagesToSave()
     {
         return [
             0 => [__DIR__ . '/../../resources/images/apple.jpg', IMAGETYPE_JPEG],
@@ -113,7 +33,7 @@ class Gd2Test extends TestCase
         ];
     }
     
-    public function imagesToCrop()
+    public static function imagesToCrop()
     {
         return [
             0 => [
@@ -144,7 +64,7 @@ class Gd2Test extends TestCase
         ];
     }
     
-    public function imagesToResize()
+    public static function imagesToResize()
     {
         return [
             0 => [
@@ -173,5 +93,5 @@ class Gd2Test extends TestCase
                 __DIR__ . '/../../resources/images/resized/butterfly_with_transparent_bg.webp'
             ],
         ];
-    }
+    }    
 }
