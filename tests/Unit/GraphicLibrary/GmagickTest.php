@@ -96,7 +96,7 @@ class GmagickTest extends AbstractTest
     private function isTypeSpported(int $type): bool {
         return 
             $type != IMAGETYPE_WEBP ||
-            in_array('WEBP', \Gmagick::queryFormats())
+            in_array('WEBP', (new \Gmagick())->queryFormats())
         ;
     }
 }
