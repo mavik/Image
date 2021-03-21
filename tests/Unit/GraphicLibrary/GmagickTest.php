@@ -13,9 +13,6 @@ namespace Mavik\Image\Tests\Unit\GraphicLibrary;
 use Mavik\Image\Tests\Unit\GraphicLibrary\AbstractTest;
 use Mavik\Image\GraphicLibrary\Gmagick;
 
-/**
- * @runTestsInSeparateProcesses
- */
 class GmagickTest extends AbstractTest
 {
     
