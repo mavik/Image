@@ -76,7 +76,7 @@ abstract class AbstractTest extends TestCase
         $this->assertEquals($height, $imageSize[1]);
         $this->assertEquals($imgType, $imageSize[2]);
         
-        $this->assertLessThan(2, CompareImages::distance($expectedFile, $savedFile));
+        $this->assertLessThan(3, CompareImages::distance($expectedFile, $savedFile));
         unlink($savedFile);
     }    
     
