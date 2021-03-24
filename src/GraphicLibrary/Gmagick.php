@@ -60,8 +60,13 @@ class Gmagick implements GraphicLibraryInterface
          */ 
         $image = new \Gmagick();
         return $image->readimageblob(file_get_contents($src));
-    }    
+    }
     
+    public function close(\Gmagick $resource)
+    {
+        unset($resource);
+    }
+
     /**
      * @param \Gmagick $resource
      * @param string $path
