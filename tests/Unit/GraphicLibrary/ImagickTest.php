@@ -76,6 +76,19 @@ class ImagickTest extends AbstractTest
         }
         parent::testResize($imgType, $width, $height, $src, $expectedFile);
     }
+
+    /**
+     * @covers Mavik\Image\GraphicLibrary\Imagick::cropAndResize
+     * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::imagesToCropAndResize
+     */
+    public function testCropAndResize(int $imgType, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, string $src, string $expectedFile)
+    {
+        if (!$this->isTypeSpported($imgType)) {
+            $this->markTestSkipped();
+            return;
+        }
+        parent::testCropAndResize($imgType, $x, $y, $width, $height, $toWidth, $toHeight, $src, $expectedFile);
+    }
     
     protected function newInstance(): Imagick
     {
