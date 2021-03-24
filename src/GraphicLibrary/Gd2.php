@@ -134,7 +134,7 @@ class Gd2 implements GraphicLibraryInterface
      * @param int $toHeight
      * @return resource
      */
-    private function cropAndResize($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    public function cropAndResize($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
     {
         if (imagecolorstotal($resource)) {
             return $this->cropAndResizeIndexedColors($resource, $x, $y, $width, $height, $toWidth, $toHeight);
