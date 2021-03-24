@@ -37,6 +37,16 @@ abstract class AbstractTest extends TestCase
         $this->verifyResource($resource);
     }
     
+    public function testClose(string $src, int $imgType, int $memorySize)
+    {
+        $resource = $this->instance->open($src, $imgType);
+        $memoryBeforeClosing = memory_get_usage();
+        $this->instance->close($resource);
+        $memoryAfterClosing = memory_get_usage();
+        $this->assertGreaterThan($memorySize, $memoryBeforeClosing - $memoryAfterClosing);
+    }
+
+
     public function testSave(string $src, int $imgType)
     {
         $savedFile = __DIR__ . '/../../temp/' . basename($src);
