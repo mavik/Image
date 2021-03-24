@@ -52,6 +52,14 @@ class Imagick implements GraphicLibraryInterface
         $this->type = $type;
         return new \Imagick($src);
     }
+    
+    /**
+     * @param \Imagick $resource
+     */
+    public function close($resource)
+    {
+        unset($resource);
+    }
 
     /**
      * @param \Imagick $resource
