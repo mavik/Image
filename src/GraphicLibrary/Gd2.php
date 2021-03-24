@@ -47,18 +47,31 @@ class Gd2 implements GraphicLibraryInterface
         switch ($type)
         {
             case IMAGETYPE_JPEG:
-                return imagecreatefromjpeg($src);
+                $resource = imagecreatefromjpeg($src);
+                break;
             case IMAGETYPE_PNG:
-                return imagecreatefrompng($src);
+                $resource = imagecreatefrompng($src);
+                break;
             case IMAGETYPE_GIF:
-                return imagecreatefromgif($src);
+                $resource = imagecreatefromgif($src);
+                break;
             case IMAGETYPE_WEBP:
-                return imagecreatefromwebp($src);
+                $resource = imagecreatefromwebp($src);
+                break;
             default:
                 throw new GraphicLibraryException('Trying to open unsupported type of image ' . image_type_to_mime_type($type));
         }
+        if (!is_resource($resource)) {
+            throw new GraphicLibraryException("Cannot open image \"{$src}\"");
+        }
+        return $resource;
     }
 
+    public function close($resource)
+    {
+        imagedestroy($resource);
+    }
+    
     /**
      * @param resource $resource
      * @param string $path
