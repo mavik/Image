@@ -57,22 +57,10 @@ interface GraphicLibraryInterface
     );
     
     /**
+     * It can be used for creating thumbnails
+     * 
      * @param mix $resource Depends on graphic library
-     * @param int $origX 
-     * @param int $origY
-     * @param int $origWidth
-     * @param int $origHeight
-     * @param int $widht
-     * @param int $height
-     * @return void
+     * @return mix Resource or object, it depends on graphic library
      */
-//    public function thumbnail(
-//        $resource, 
-//        int $origX, 
-//        int $origY, 
-//        int $origWidth, 
-//        int $origHeight, 
-//        int $widht, 
-//        int $height
-//    ): void;
+    public function cropAndResize($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight);
 }
