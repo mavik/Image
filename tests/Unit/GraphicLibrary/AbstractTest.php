@@ -79,6 +79,23 @@ abstract class AbstractTest extends TestCase
         $this->assertLessThan(3, CompareImages::distance($expectedFile, $savedFile));
         unlink($savedFile);
     }    
+
+    public function testCropAndResize(int $imgType, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, string $src, string $expectedFile)
+    {
+        $savedFile = __DIR__ . '/../../temp/' . basename($src);
+        
+        $image = $this->instance->open($src, $imgType);
+        $cropedImage = $this->instance->cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight);
+        $this->instance->save($cropedImage, $savedFile, $imgType);
+        
+        $imageSize = getimagesize($savedFile);
+        $this->assertEquals($toWidth, $imageSize[0]);
+        $this->assertEquals($toHeight, $imageSize[1]);
+        $this->assertEquals($imgType, $imageSize[2]);
+        
+        $this->assertLessThan(1, CompareImages::distance($expectedFile, $savedFile));
+        unlink($savedFile);
+    }
     
     abstract protected function newInstance(): GraphicLibraryInterface;
     
