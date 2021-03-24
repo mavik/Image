@@ -33,6 +33,13 @@ interface GraphicLibraryInterface
      * @return void
      */
     public function save($resource, string $path, int $type): void;
+    
+    /**
+     * Free resources
+     * 
+     * @param mix $resource Depends on graphic library
+     */
+    public function close($resource);
 
     /**
      * @param mix $resource Depends on graphic library
