@@ -100,4 +100,15 @@ class Gmagick implements GraphicLibraryInterface
         return $resource;
     }
 
+    /**
+     * @param \Gmagick $image
+     * @return \Gmagick
+     */
+    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight)
+    {
+        $cropedImage = $this->crop($image, $x, $y, $width, $height);
+        return $this->resize($cropedImage, $toWidth, $toHeight);
+    }
+
+    
 }
