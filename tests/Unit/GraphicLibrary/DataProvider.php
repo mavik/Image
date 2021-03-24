@@ -23,13 +23,6 @@ class DataProvider
         ];
     }
     
-    public static function imagesToClose()
-    {
-        return [
-            0 => [__DIR__ . '/../../resources/images/apple.jpg', IMAGETYPE_JPEG, 224643],
-        ];
-    }
-    
     public static function imagesToSave()
     {
         return [

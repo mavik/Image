@@ -24,15 +24,6 @@ class Gd2Test extends AbstractTest
     {
         parent::testOpen($src, $imgType);
     }
-
-    /**
-     * @covers Mavik\Image\GraphicLibrary\Gd2::close
-     * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::imagesToClose
-     */
-    public function testClose(string $src, int $imgType, int $memorySize)
-    {
-        parent::testClose($src, $imgType, $memorySize);
-    }
     
     /**
      * @covers Mavik\Image\GraphicLibrary\Gd2::save
