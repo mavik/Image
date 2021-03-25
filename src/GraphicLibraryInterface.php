@@ -18,9 +18,9 @@ interface GraphicLibraryInterface
     /**
      * Returns graphic resource or object
      * 
-     * @param string $src
+     * @param string $src Url or path to image
      * @param int $type IMAGETYPE_XXX
-     * @return mix
+     * @return mix Depends on graphic library
      */
     public function open(string $src, int $type);
 
@@ -43,18 +43,12 @@ interface GraphicLibraryInterface
 
     /**
      * @param mix $resource Depends on graphic library
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
      * @return mix Resource or object, it depends on graphic library
      */
     public function crop($resource, int $x, int $y, int $width, int $height);
 
     /**
      * @param mix $resource Depends on graphic library
-     * @param int $width
-     * @param int $height
      * @return mix Resource or object, it depends on graphic library
      */
     public function resize(
@@ -64,7 +58,10 @@ interface GraphicLibraryInterface
     );
     
     /**
-     * It can be used for creating thumbnails
+     * It can be used for creating thumbnails.
+     * 
+     * Some library can do it as one operation,
+     * and we don't want use two operations with these libraries
      * 
      * @param mix $resource Depends on graphic library
      * @return mix Resource or object, it depends on graphic library
