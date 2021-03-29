@@ -104,110 +104,93 @@ class Gd2 implements GraphicLibraryInterface
     
     /**
      * @param resource $image
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
      * @return resource
      */
-    public function crop($image, int $x, int $y, int $width, int $height)
+    public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false)
     {
         if ($this->imageType == IMAGETYPE_JPEG || $this->imageType == IMAGETYPE_WBMP) {
-            $newResource = imagecrop($image, [
+            $newImage = imagecrop($image, [
                 'x' => $x,
                 'y' => $y,
                 'width' => $width,
                 'height' => $height
-            ]);            
-            imagedestroy($image);
-            return $newResource;
-        } else {        
-            return $this->cropAndResize($image, $x, $y, $width, $height, $width, $height);
+            ]);                        
+            if (!$immutable) {
+                imagedestroy($image);
+            }
+            return $newImage;
+        } else {
+            // imagecrop works incorrect with indexed images with transparent
+            return $this->cropAndResize($image, $x, $y, $width, $height, $width, $height, $immutable);
         }        
     }
     
     /**
      * @param resource $image
-     * @param int $widht
-     * @param int $height
      * @return resource
      */
-    public function resize($image, int $width, int $height)
+    public function resize($image, int $width, int $height, bool $immutable = false)
     {
-        return $this->cropAndResize($image, 0, 0, imagesx($image), imagesy($image), $width, $height);
+        return $this->cropAndResize($image, 0, 0, imagesx($image), imagesy($image), $width, $height, $immutable);
     }
 
     /**
      * @param resource $image
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
-     * @param int $toWidth
-     * @param int $toHeight
      * @return resource
      */
-    public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable = false)
     {
         if (imagecolorstotal($image)) {
-            return $this->cropAndResizeIndexedColors($image, $x, $y, $width, $height, $toWidth, $toHeight);
+            return $this->cropAndResizeIndexedColors($image, $x, $y, $width, $height, $toWidth, $toHeight, $immutable);
         } else {
-            return $this->cropAndResizeTrueColors($image, $x, $y, $width, $height, $toWidth, $toHeight);
+            return $this->cropAndResizeTrueColors($image, $x, $y, $width, $height, $toWidth, $toHeight, $immutable);
         }
     }
     
     /**
      * @param resource $image
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
-     * @param int $toWidth
-     * @param int $toHeight
      * @return resource
      */
-    private function cropAndResizeTrueColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    private function cropAndResizeTrueColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable)
     {
-        $newResource = imagecreatetruecolor($toWidth, $toHeight);
+        $newImage = imagecreatetruecolor($toWidth, $toHeight);
         if ($this->imageType != IMAGETYPE_JPEG) {
-            imagealphablending($newResource, false);
-            imagesavealpha($newResource, true);
-            $transparent = imagecolorallocatealpha($newResource, 255, 255, 255, 127);
-            imagefilledrectangle($newResource, 0, 0, $width, $height, $transparent);
+            imagealphablending($newImage, false);
+            imagesavealpha($newImage, true);
+            $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
+            imagefilledrectangle($newImage, 0, 0, $width, $height, $transparent);
         }
-        imagecopyresampled($newResource, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
-        imagedestroy($image);
-        return $newResource;
+        imagecopyresampled($newImage, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
+        if (!$immutable) {
+            imagedestroy($image);
+        }
+        return $newImage;
     }
     
     /**
      * @param resource $image
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
-     * @param int $toWidth
-     * @param int $toHeight
      * @return resource
      */
-    private function cropAndResizeIndexedColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    private function cropAndResizeIndexedColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable)
     {
-        $newResource = imagecreatetruecolor($toWidth, $toHeight);
+        $newImage = imagecreatetruecolor($toWidth, $toHeight);
         
         $transparentIndex = imagecolortransparent($image);
         if ($transparentIndex >= 0) {
             $transparentRgb = imagecolorsforindex($image, $transparentIndex);
-            $newTransparentIndex = imagecolorexact($newResource, $transparentRgb['red'], $transparentRgb['green'], $transparentRgb['blue']);
-            imagefilledrectangle($newResource, 0, 0, $width, $height, $newTransparentIndex);
-            imagecolortransparent($newResource, $newTransparentIndex);
+            $newTransparentIndex = imagecolorexact($newImage, $transparentRgb['red'], $transparentRgb['green'], $transparentRgb['blue']);
+            imagefilledrectangle($newImage, 0, 0, $width, $height, $newTransparentIndex);
+            imagecolortransparent($newImage, $newTransparentIndex);
         }
         
-        imagecopyresized($newResource, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
+        imagecopyresized($newImage, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
         
         $colorNumbers = imagecolorstotal($image);
-        imagetruecolortopalette($newResource, false, $colorNumbers);
+        imagetruecolortopalette($newImage, false, $colorNumbers);
         
-        imagedestroy($image);
-        return $newResource;        
+        if (!$immutable) {
+            imagedestroy($image);
+        }
+        return $newImage;        
     }
 }

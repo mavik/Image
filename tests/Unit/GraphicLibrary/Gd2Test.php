@@ -60,7 +60,7 @@ class Gd2Test extends AbstractTest
     {
         parent::testCropAndResize($imgType, $x, $y, $width, $height, $toWidth, $toHeight, $src, $expectedFile);
     }
-    
+        
     protected function newInstance(): \Mavik\Image\GraphicLibraryInterface
     {
         return new Gd2();
