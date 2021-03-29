@@ -56,7 +56,7 @@ class Imagick implements GraphicLibraryInterface
     /**
      * @param \Imagick $image
      */
-    public function close($image)
+    public function close($image): void
     {
         unset($image);
     }

@@ -62,7 +62,7 @@ class Gmagick implements GraphicLibraryInterface
         return $image->readimageblob(file_get_contents($src));
     }
     
-    public function close($image)
+    public function close($image): void
     {
         unset($image);
     }

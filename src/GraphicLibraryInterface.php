@@ -39,7 +39,7 @@ interface GraphicLibraryInterface
      * 
      * @param mix $image Type depends on graphic library
      */
-    public function close($image);
+    public function close($image): void;
 
     /**
      * @param mix $image Type depends on graphic library

@@ -67,7 +67,7 @@ class Gd2 implements GraphicLibraryInterface
         return $image;
     }
 
-    public function close($image)
+    public function close($image): void
     {
         imagedestroy($image);
     }
