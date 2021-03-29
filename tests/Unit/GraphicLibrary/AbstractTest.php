@@ -18,7 +18,7 @@ use Mavik\Image\GraphicLibraryInterface;
 abstract class AbstractTest extends TestCase
 {
     /** @var GraphicLibraryInterface */
-    private $instance;
+    protected $instance;
     
     public static function setUpBeforeClass(): void
     {
@@ -96,6 +96,35 @@ abstract class AbstractTest extends TestCase
         $this->assertLessThan(3, CompareImages::distance($expectedFile, $savedFile));
         unlink($savedFile);
     }
+    
+    public function testImmutable()
+    {
+        $imagePath = __DIR__ . '/../../resources/images/apple.jpg';
+        $tempImagePath = __DIR__ . '/../../temp/apple.jpg';
+        $imageSize = getimagesize($imagePath);        
+        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);
+        
+        $this->instance->crop($image, 50, 50, 300, 300, true);
+        $this->assertNotEmpty($image);
+        $this->instance->save($image, $tempImagePath, IMAGETYPE_JPEG);
+        $tempImageSize = getimagesize($tempImagePath);
+        $this->assertEquals($imageSize, $tempImageSize);
+        unlink($tempImagePath);
+        
+        $this->instance->resize($image, 300, 300, true);
+        $this->assertNotEmpty($image);
+        $this->instance->save($image, $tempImagePath, IMAGETYPE_JPEG);
+        $tempImageSize = getimagesize($tempImagePath);
+        $this->assertEquals($imageSize, $tempImageSize);
+        unlink($tempImagePath);
+        
+        $this->instance->cropAndResize($image, 50, 50, 600, 600, 300, 300, true);
+        $this->assertNotEmpty($image);
+        $this->instance->save($image, $tempImagePath, IMAGETYPE_JPEG);
+        $tempImageSize = getimagesize($tempImagePath);
+        $this->assertEquals($imageSize, $tempImageSize);
+        unlink($tempImagePath);
+    }    
     
     abstract protected function newInstance(): GraphicLibraryInterface;
     
