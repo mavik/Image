@@ -62,47 +62,47 @@ class Gmagick implements GraphicLibraryInterface
         return $image->readimageblob(file_get_contents($src));
     }
     
-    public function close(\Gmagick $resource)
+    public function close($image)
     {
-        unset($resource);
+        unset($image);
     }
 
     /**
-     * @param \Gmagick $resource
+     * @param \Gmagick $image
      * @param string $path
      * @param int $type IMAGETYPE_XXX
      * @throws GraphicLibraryException
      */
-    public function save($resource, string $path, int $type): void
+    public function save($image, string $path, int $type): void
     {
-        if (!$resource->setimageformat(self::TYPES[$type])) {
+        if (!$image->setimageformat(self::TYPES[$type])) {
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");
         }
-        $resource->writeimage($path);
+        $image->writeimage($path);
     }
     
     /**
-     * @param \Gmagick $resource
+     * @param \Gmagick $image
      * @param int $x
      * @param int $y
      * @param int $width
      * @param int $height
      * @return \Gmagick
      */
-    public function crop($resource, int $x, int $y, int $width, int $height): \Gmagick
+    public function crop($image, int $x, int $y, int $width, int $height): \Gmagick
     {
-        $resource->cropImage($width, $height, $x, $y);
-        return $resource;
+        $image->cropImage($width, $height, $x, $y);
+        return $image;
     }
     
     /**
-     * @param \Gmagick $resource
+     * @param \Gmagick $image
      * @return \Gmagick
      */
-    public function resize($resource, int $width, int $height): \Gmagick
+    public function resize($image, int $width, int $height): \Gmagick
     {
-        $resource->resizeimage($width, $height, \Gmagick::FILTER_TRIANGLE, 1);
-        return $resource;
+        $image->resizeimage($width, $height, \Gmagick::FILTER_TRIANGLE, 1);
+        return $image;
     }
 
     /**

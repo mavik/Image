@@ -16,43 +16,43 @@ interface GraphicLibraryInterface
     public static function isInstalled(): bool;
 
     /**
-     * Returns graphic resource or object
+     * Returns image - resource or object
      * 
      * @param string $src Url or path to image
      * @param int $type IMAGETYPE_XXX
-     * @return mix Depends on graphic library
+     * @return mix Type depends on graphic library
      */
     public function open(string $src, int $type);
 
     /**
      * Save image to file
      * 
-     * @param mix $resource Depends on graphic library
+     * @param mix $image Type depends on graphic library
      * @param string $path
      * @param int $type IMAGETYPE_XXX
      * @return void
      */
-    public function save($resource, string $path, int $type): void;
+    public function save($image, string $path, int $type): void;
     
     /**
      * Free resources
      * 
-     * @param mix $resource Depends on graphic library
+     * @param mix $image Type depends on graphic library
      */
-    public function close($resource);
+    public function close($image);
 
     /**
-     * @param mix $resource Depends on graphic library
-     * @return mix Resource or object, it depends on graphic library
+     * @param mix $image Type depends on graphic library
+     * @return mix Image - resource or object, it depends on graphic library
      */
-    public function crop($resource, int $x, int $y, int $width, int $height);
+    public function crop($image, int $x, int $y, int $width, int $height);
 
     /**
-     * @param mix $resource Depends on graphic library
-     * @return mix Resource or object, it depends on graphic library
+     * @param mix $image Depends on graphic library
+     * @return mix Image - resource or object, it depends on graphic library
      */
     public function resize(
-        $resource, 
+        $image, 
         int $width, 
         int $height
     );
@@ -63,8 +63,8 @@ interface GraphicLibraryInterface
      * Some library can do it as one operation,
      * and we don't want use two operations with these libraries
      * 
-     * @param mix $resource Depends on graphic library
-     * @return mix Resource or object, it depends on graphic library
+     * @param mix $image Type depends on graphic library
+     * @return mix Image - resource or object, it depends on graphic library
      */
-    public function cropAndResize($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight);
+    public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight);
 }

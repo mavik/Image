@@ -54,59 +54,59 @@ class Imagick implements GraphicLibraryInterface
     }
     
     /**
-     * @param \Imagick $resource
+     * @param \Imagick $image
      */
-    public function close($resource)
+    public function close($image)
     {
-        unset($resource);
+        unset($image);
     }
 
     /**
-     * @param \Imagick $resource
+     * @param \Imagick $image
      * @param string $path
      * @param int $type IMAGETYPE_XXX
      * @return void
      * @throws GraphicLibraryException
      */
-    public function save($resource, string $path, int $type): void
+    public function save($image, string $path, int $type): void
     {
-        if(!$resource->setImageFormat(self::TYPES[$type])) {
+        if(!$image->setImageFormat(self::TYPES[$type])) {
             throw new GraphicLibraryException('Format ' . self::TYPES[$type] . ' is not supported be Imagick.');
         }
-        $resource->writeImage($path);
+        $image->writeImage($path);
     }
     
     /**
-     * @param \Imagick $resource
+     * @param \Imagick $image
      * @param int $x
      * @param int $y
      * @param int $width
      * @param int $height
      * @return \Imagick
      */
-    public function crop($resource, int $x, int $y, int $width, int $height)
+    public function crop($image, int $x, int $y, int $width, int $height)
     {
-        $resource->cropImage($width, $height, $x, $y);        
+        $image->cropImage($width, $height, $x, $y);        
         /** Fix incorrect size of cropped gif */
         if ($this->type == IMAGETYPE_GIF) {
-            $resource->setImagePage($width, $height, 0, 0);
+            $image->setImagePage($width, $height, 0, 0);
         }        
-        return $resource;
+        return $image;
     }
 
     /**
-     * @param \Imagick $resource
+     * @param \Imagick $image
      * @param int $width
      * @param int $height
      * @return \Imagick
      * @throws GraphicLibraryException
      */
-    public function resize($resource, int $width, int $height)
+    public function resize($image, int $width, int $height)
     {
-        if (!$resource->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1)) {
+        if (!$image->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1)) {
             throw new GraphicLibraryException("Imagick: Image cannot be resized.");
         }
-        return $resource;
+        return $image;
     }
     
     /**

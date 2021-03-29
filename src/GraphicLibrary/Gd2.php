@@ -47,52 +47,52 @@ class Gd2 implements GraphicLibraryInterface
         switch ($type)
         {
             case IMAGETYPE_JPEG:
-                $resource = imagecreatefromjpeg($src);
+                $image = imagecreatefromjpeg($src);
                 break;
             case IMAGETYPE_PNG:
-                $resource = imagecreatefrompng($src);
+                $image = imagecreatefrompng($src);
                 break;
             case IMAGETYPE_GIF:
-                $resource = imagecreatefromgif($src);
+                $image = imagecreatefromgif($src);
                 break;
             case IMAGETYPE_WEBP:
-                $resource = imagecreatefromwebp($src);
+                $image = imagecreatefromwebp($src);
                 break;
             default:
                 throw new GraphicLibraryException('Trying to open unsupported type of image ' . image_type_to_mime_type($type));
         }
-        if (!is_resource($resource)) {
+        if (!is_resource($image)) {
             throw new GraphicLibraryException("Cannot open image \"{$src}\"");
         }
-        return $resource;
+        return $image;
     }
 
-    public function close($resource)
+    public function close($image)
     {
-        imagedestroy($resource);
+        imagedestroy($image);
     }
     
     /**
-     * @param resource $resource
+     * @param resource $image
      * @param string $path
      * @param int $type IMAGETYPE_XXX
      * @return void
      * @throws GraphicLibraryException
      */
-    public function save($resource, string $path, int $type): void
+    public function save($image, string $path, int $type): void
     {
         switch ($type) {
             case IMAGETYPE_JPEG:
-                $result = imagejpeg($resource, $path, $this->configuration['jpg_quality']);
+                $result = imagejpeg($image, $path, $this->configuration['jpg_quality']);
                 break;
             case IMAGETYPE_PNG:
-                $result = imagepng($resource, $path, $type);
+                $result = imagepng($image, $path, $type);
                 break;
             case IMAGETYPE_GIF:
-                $result = imagegif($resource, $path);
+                $result = imagegif($image, $path);
                 break;
             case IMAGETYPE_WEBP:
-                $result = imagewebp($resource, $path, $this->configuration['webp_quality']);
+                $result = imagewebp($image, $path, $this->configuration['webp_quality']);
                 break;
             default :
                 throw new GraphicLibraryException('Trying to save unsupported type of image ' . image_type_to_mime_type($type));
@@ -103,42 +103,42 @@ class Gd2 implements GraphicLibraryInterface
     }   
     
     /**
-     * @param resource $resource
+     * @param resource $image
      * @param int $x
      * @param int $y
      * @param int $width
      * @param int $height
      * @return resource
      */
-    public function crop($resource, int $x, int $y, int $width, int $height)
+    public function crop($image, int $x, int $y, int $width, int $height)
     {
         if ($this->imageType == IMAGETYPE_JPEG || $this->imageType == IMAGETYPE_WBMP) {
-            $newResource = imagecrop($resource, [
+            $newResource = imagecrop($image, [
                 'x' => $x,
                 'y' => $y,
                 'width' => $width,
                 'height' => $height
             ]);            
-            imagedestroy($resource);
+            imagedestroy($image);
             return $newResource;
         } else {        
-            return $this->cropAndResize($resource, $x, $y, $width, $height, $width, $height);
+            return $this->cropAndResize($image, $x, $y, $width, $height, $width, $height);
         }        
     }
     
     /**
-     * @param resource $resource
+     * @param resource $image
      * @param int $widht
      * @param int $height
      * @return resource
      */
-    public function resize($resource, int $width, int $height)
+    public function resize($image, int $width, int $height)
     {
-        return $this->cropAndResize($resource, 0, 0, imagesx($resource), imagesy($resource), $width, $height);
+        return $this->cropAndResize($image, 0, 0, imagesx($image), imagesy($image), $width, $height);
     }
 
     /**
-     * @param resource $resource
+     * @param resource $image
      * @param int $x
      * @param int $y
      * @param int $width
@@ -147,17 +147,17 @@ class Gd2 implements GraphicLibraryInterface
      * @param int $toHeight
      * @return resource
      */
-    public function cropAndResize($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
     {
-        if (imagecolorstotal($resource)) {
-            return $this->cropAndResizeIndexedColors($resource, $x, $y, $width, $height, $toWidth, $toHeight);
+        if (imagecolorstotal($image)) {
+            return $this->cropAndResizeIndexedColors($image, $x, $y, $width, $height, $toWidth, $toHeight);
         } else {
-            return $this->cropAndResizeTrueColors($resource, $x, $y, $width, $height, $toWidth, $toHeight);
+            return $this->cropAndResizeTrueColors($image, $x, $y, $width, $height, $toWidth, $toHeight);
         }
     }
     
     /**
-     * @param resource $resource
+     * @param resource $image
      * @param int $x
      * @param int $y
      * @param int $width
@@ -166,7 +166,7 @@ class Gd2 implements GraphicLibraryInterface
      * @param int $toHeight
      * @return resource
      */
-    private function cropAndResizeTrueColors($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    private function cropAndResizeTrueColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
     {
         $newResource = imagecreatetruecolor($toWidth, $toHeight);
         if ($this->imageType != IMAGETYPE_JPEG) {
@@ -175,13 +175,13 @@ class Gd2 implements GraphicLibraryInterface
             $transparent = imagecolorallocatealpha($newResource, 255, 255, 255, 127);
             imagefilledrectangle($newResource, 0, 0, $width, $height, $transparent);
         }
-        imagecopyresampled($newResource, $resource, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
-        imagedestroy($resource);
+        imagecopyresampled($newResource, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
+        imagedestroy($image);
         return $newResource;
     }
     
     /**
-     * @param resource $resource
+     * @param resource $image
      * @param int $x
      * @param int $y
      * @param int $width
@@ -190,24 +190,24 @@ class Gd2 implements GraphicLibraryInterface
      * @param int $toHeight
      * @return resource
      */
-    private function cropAndResizeIndexedColors($resource, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
+    private function cropAndResizeIndexedColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight)
     {
         $newResource = imagecreatetruecolor($toWidth, $toHeight);
         
-        $transparentIndex = imagecolortransparent($resource);
+        $transparentIndex = imagecolortransparent($image);
         if ($transparentIndex >= 0) {
-            $transparentRgb = imagecolorsforindex($resource, $transparentIndex);
+            $transparentRgb = imagecolorsforindex($image, $transparentIndex);
             $newTransparentIndex = imagecolorexact($newResource, $transparentRgb['red'], $transparentRgb['green'], $transparentRgb['blue']);
             imagefilledrectangle($newResource, 0, 0, $width, $height, $newTransparentIndex);
             imagecolortransparent($newResource, $newTransparentIndex);
         }
         
-        imagecopyresized($newResource, $resource, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
+        imagecopyresized($newResource, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
         
-        $colorNumbers = imagecolorstotal($resource);
+        $colorNumbers = imagecolorstotal($image);
         imagetruecolortopalette($newResource, false, $colorNumbers);
         
-        imagedestroy($resource);
+        imagedestroy($image);
         return $newResource;        
     }
 }
