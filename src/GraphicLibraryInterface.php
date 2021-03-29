@@ -45,7 +45,7 @@ interface GraphicLibraryInterface
      * @param mix $image Type depends on graphic library
      * @return mix Image - resource or object, it depends on graphic library
      */
-    public function crop($image, int $x, int $y, int $width, int $height);
+    public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false);
 
     /**
      * @param mix $image Depends on graphic library
@@ -54,7 +54,8 @@ interface GraphicLibraryInterface
     public function resize(
         $image, 
         int $width, 
-        int $height
+        int $height,
+        bool $immutable = false
     );
     
     /**
@@ -66,5 +67,14 @@ interface GraphicLibraryInterface
      * @param mix $image Type depends on graphic library
      * @return mix Image - resource or object, it depends on graphic library
      */
-    public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight);
+    public function cropAndResize(
+        $image, 
+        int $x, 
+        int $y, 
+        int $width, 
+        int $height, 
+        int $toWidth, 
+        int $toHeight, 
+        bool $immutable = false
+    );
 }
