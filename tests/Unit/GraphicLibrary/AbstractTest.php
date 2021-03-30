@@ -124,6 +124,23 @@ abstract class AbstractTest extends TestCase
         $tempImageSize = getimagesize($tempImagePath);
         $this->assertEquals($imageSize, $tempImageSize);
         unlink($tempImagePath);
+    }
+    
+    public function testMutable()
+    {
+        $imagePath = __DIR__ . '/../../resources/images/apple.jpg';
+        
+        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);        
+        $processedImage = $this->instance->crop($image, 50, 50, 300, 300);
+        $this->assertEquals($processedImage, $image);
+        
+        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);        
+        $processedImage = $this->instance->resize($image, 300, 300);
+        $this->assertEquals($processedImage, $image);
+        
+        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);        
+        $processedImage = $this->instance->cropAndResize($image, 50, 50, 600, 600, 300, 300);
+        $this->assertEquals($processedImage, $image);
     }    
     
     abstract protected function newInstance(): GraphicLibraryInterface;
