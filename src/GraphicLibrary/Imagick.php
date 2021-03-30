@@ -43,7 +43,6 @@ class Imagick implements GraphicLibraryInterface
     }
     
     /**
-     * @param string $src
      * @param int $type IMAGETYPE_XXX
      * @return \Imagick
      */
@@ -63,9 +62,7 @@ class Imagick implements GraphicLibraryInterface
 
     /**
      * @param \Imagick $image
-     * @param string $path
      * @param int $type IMAGETYPE_XXX
-     * @return void
      * @throws GraphicLibraryException
      */
     public function save($image, string $path, int $type): void
@@ -78,45 +75,40 @@ class Imagick implements GraphicLibraryInterface
     
     /**
      * @param \Imagick $image
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
      * @return \Imagick
      */
-    public function crop($image, int $x, int $y, int $width, int $height)
+    public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false)
     {
-        $image->cropImage($width, $height, $x, $y);        
+        $tmpImage = $immutable ? clone $image : $image;
+        $tmpImage->cropImage($width, $height, $x, $y);        
         /** Fix incorrect size of cropped gif */
         if ($this->type == IMAGETYPE_GIF) {
-            $image->setImagePage($width, $height, 0, 0);
+            $tmpImage->setImagePage($width, $height, 0, 0);
         }        
-        return $image;
+        return $tmpImage;
     }
 
     /**
      * @param \Imagick $image
-     * @param int $width
-     * @param int $height
-     * @return \Imagick
      * @throws GraphicLibraryException
      */
-    public function resize($image, int $width, int $height)
+    public function resize($image, int $width, int $height, bool $immutable = false)
     {
-        if (!$image->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1)) {
+        $tmpImage = $immutable ? clone $image : $image;
+        if (!$tmpImage->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1)) {
             throw new GraphicLibraryException("Imagick: Image cannot be resized.");
         }
-        return $image;
+        return $tmpImage;
     }
     
     /**
      * @param \Imagick $image
      * @return \Imagick
      */
-    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight)
+    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight, bool $immutable = false)
     {
-        $cropedImage = $this->crop($image, $x, $y, $width, $height);
+        $tmpImage = $immutable ? clone $image : $image;        
+        $cropedImage = $this->crop($tmpImage, $x, $y, $width, $height);
         return $this->resize($cropedImage, $toWidth, $toHeight);
     }
-
 }
