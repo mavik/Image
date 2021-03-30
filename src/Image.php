@@ -69,15 +69,6 @@ class Image
     }
     
     /**
-     * @param string $src Path or URL
-     */
-    public function open(string $src)
-    {
-        $fileName = new FileName($src);
-        $this->file = new ImageFile($fileName->getUrl(), $fileName->getPath());
-    }
-
-    /**
      * Static constructor
      * 
      * @param string $src Path or URL
@@ -94,6 +85,26 @@ class Image
     {
         $image = new self();
         $image->loadFromString($content);
+    }
+        
+    /**
+     * @param string $src Path or URL
+     */
+    public function open(string $src)
+    {
+        $fileName = new FileName($src);
+        $this->file = new ImageFile($fileName->getUrl(), $fileName->getPath());
+    }
+
+    public function save(string $path): Image
+    {
+        $this->getGraphicLibrary()->save($this->getResource(), $path, $this->getType());
+        return $this;
+    }    
+    
+    public function close(): void
+    {
+        $this->getGraphicLibrary()->close($this->getResource());
     }
     
     public function getUrl(): ?string
@@ -138,12 +149,30 @@ class Image
         return $this->file ? $this->file->getFileSize() : null;
     }    
     
-    public function save(string $path): Image
+    public function resize(int $width, int $height): Image
     {
-        $this->getGraphicLibrary()->save($this->getResource(), $path, $this->getType());
+        $this->getGraphicLibrary()->resize($this->getResource(), $width, $height);
         return $this;
     }
-    
+
+    public function crop(int $x, int $y, int $width, int $height): Image
+    {
+        $this->getGraphicLibrary()->crop($this->getResource(), $x, $y, $width, $height);
+        return $this;
+    }
+
+    public function cropAndResize(
+        int $x,
+        int $y,
+        int $width,
+        int $height,
+        int $toWidth,
+        int $toHeight
+    ) {
+        $this->getGraphicLibrary()->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
+        return $this;
+    }
+
     private function getGraphicLibrary(): GraphicLibraryInterface
     {
         if (!isset($this->graphicLibrary)) {
