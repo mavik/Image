@@ -89,31 +89,32 @@ class Gmagick implements GraphicLibraryInterface
      * @param int $height
      * @return \Gmagick
      */
-    public function crop($image, int $x, int $y, int $width, int $height): \Gmagick
+    public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false): \Gmagick
     {
-        $image->cropImage($width, $height, $x, $y);
-        return $image;
+        $tmpImage = $immutable ? clone $image : $image;
+        $tmpImage->cropImage($width, $height, $x, $y);
+        return $tmpImage;
     }
     
     /**
      * @param \Gmagick $image
      * @return \Gmagick
      */
-    public function resize($image, int $width, int $height): \Gmagick
+    public function resize($image, int $width, int $height, bool $immutable = false): \Gmagick
     {
-        $image->resizeimage($width, $height, \Gmagick::FILTER_TRIANGLE, 1);
-        return $image;
+        $tmpImage = $immutable ? clone $image : $image;
+        $tmpImage->resizeimage($width, $height, \Gmagick::FILTER_TRIANGLE, 1);
+        return $tmpImage;
     }
 
     /**
      * @param \Gmagick $image
      * @return \Gmagick
      */
-    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight)
+    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight, bool $immutable = false)
     {
-        $cropedImage = $this->crop($image, $x, $y, $width, $height);
+        $tmpImage = $immutable ? clone $image : $image;
+        $cropedImage = $this->crop($tmpImage, $x, $y, $width, $height);
         return $this->resize($cropedImage, $toWidth, $toHeight);
     }
-
-    
 }
