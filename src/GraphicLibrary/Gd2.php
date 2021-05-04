@@ -50,7 +50,8 @@ class Gd2 implements GraphicLibraryInterface
                 $image = imagecreatefromjpeg($src);
                 break;
             case IMAGETYPE_PNG:
-                $image = imagecreatefrompng($src);
+                $image = imagecreatefrompng($src);                
+                imagealphablending($image, false);
                 break;
             case IMAGETYPE_GIF:
                 $image = imagecreatefromgif($src);
@@ -86,6 +87,7 @@ class Gd2 implements GraphicLibraryInterface
                 $result = imagejpeg($image, $path, $this->configuration['jpg_quality']);
                 break;
             case IMAGETYPE_PNG:
+                imageSaveAlpha($image, true);
                 $result = imagepng($image, $path, $type);
                 break;
             case IMAGETYPE_GIF:
