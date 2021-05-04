@@ -16,7 +16,7 @@ class CompareImages
     {
         $image1 = realpath($image1);
         $image2 = realpath($image2);
-        $cmd = "gm compare -metric MSE \"{$image1}\" \"{$image2}\"";
+        $cmd = "gm compare -matte -metric MSE \"{$image1}\" \"{$image2}\"";
         exec($cmd, $output);
         foreach ($output as $line) {
             preg_match('/Total:\s+(0\.\d+)\s+\d+\.\d+/', $line, $matches);
