@@ -38,11 +38,19 @@ class FileNameTest extends TestCase
         
     public function files()
     {
+        $webRootDir = __DIR__ . '/../resources';
+        
+        /**
+         * config
+         * tested src
+         * expected path
+         * expected url
+         */
         return [
             [   0 =>
                 [
                     'base_url' => 'http://test.com/',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 'http://test.com/images/apple.jpg',
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -50,7 +58,7 @@ class FileNameTest extends TestCase
             ],[ 1 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 'http://test.com/resources/images/apple.jpg',
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -58,7 +66,7 @@ class FileNameTest extends TestCase
             ],[ 2 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 'http://test2.com/resources/images/apple.jpg',
                 null,
@@ -66,7 +74,7 @@ class FileNameTest extends TestCase
             ],[ 3 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 'http://test.com/site2/images/apple.jpg',
                 null,
@@ -74,7 +82,7 @@ class FileNameTest extends TestCase
             ],[ 4 =>
                 [
                     'base_url' => 'http://test.com/resources/',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 '/resources/images/apple.jpg',
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -82,7 +90,7 @@ class FileNameTest extends TestCase
             ],[ 5 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources/'
+                    'web_root_dir' => $webRootDir
                 ],
                 'images/apple.jpg',
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -90,7 +98,7 @@ class FileNameTest extends TestCase
             ],[ 6 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -98,7 +106,7 @@ class FileNameTest extends TestCase
             ],[ 7 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 __DIR__ . '/../resources/images/apple.jpg',
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -106,7 +114,7 @@ class FileNameTest extends TestCase
             ],[ 8 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
                 'resources/images/beach.webp',
                 realpath(__DIR__ . '/../resources/images/beach.webp'),
@@ -114,9 +122,9 @@ class FileNameTest extends TestCase
             ],[ 9 =>
                 [
                     'base_url' => 'http://test.com/resources',
-                    'web_root_dir' => __DIR__ . '/../resources'
+                    'web_root_dir' => $webRootDir
                 ],
-                'src/../resources/images/beach.webp',
+                '/src/../resources/images/beach.webp',
                 realpath(__DIR__ . '/../resources/images/beach.webp'),
                 'http://test.com/resources/images/beach.webp'
             ]

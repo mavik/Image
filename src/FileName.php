@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Mavik\Image;
 
+use Mavik\Image\Exception;
 use Mavik\Image\Exception\FileException;
-use Mavik\Image\Exception\ConfigurationException;
 
 /**
  * Manipulations with pathes and URLs
@@ -107,7 +107,7 @@ class FileName
     }
     
     private function initFromRelativeUrl(): void
-    {
+    {        
         $this->url = $this->relativeUrlToAbsolute($this->src);
         $this->path = $this->absoluteUrlToPath($this->url);
     }
@@ -154,9 +154,9 @@ class FileName
     {
         if (strpos($url, '/') === 0) {
             $baseUrlParts = parse_url(self::$configuration['base_url']);
-            return $baseUrlParts['scheme'] . '://' . $baseUrlParts['host'] . $url;
+            return $baseUrlParts['scheme'] . '://' . $baseUrlParts['host'] . $this->normalizePath($url);
         } else {
-            return self::$configuration['base_url'] . $url;
+            return self::$configuration['base_url'] . $this->normalizePath($url);
         }
     }
 
@@ -169,5 +169,28 @@ class FileName
             self::$configuration['base_url'] . 
             substr(str_replace('\\', '/', $path), strlen(self::$configuration['web_root_dir']))
         ;
-    }    
+    }
+
+    /**
+     * Processes '.' and '..' in path
+     * 
+     * @throws Exception
+     */
+    private function normalizePath(string $path): string
+    {        
+        $parts = explode('/', $path);
+        for ($i = count($parts) - 1; $i >= 0; --$i) {
+            $part = $parts[$i];
+            if ($part == '.') {
+                unset($parts[$i]);
+            } elseif ($part == '..') {
+                if ($i == 0 || $i == 1 && $parts[0] === '') {
+                    throw new Exception("Can't normalize path \"{$path}\"");
+                }
+                unset($parts[$i]);
+                unset($parts[--$i]);
+            }
+        }
+        return implode('/', $parts);
+    }
 }
