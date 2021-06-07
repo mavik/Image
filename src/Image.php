@@ -165,7 +165,7 @@ class Image
 
     public function crop(int $x, int $y, int $width, int $height): Image
     {
-        $this->getGraphicLibrary()->crop($this->getResource(), $x, $y, $width, $height);
+        $this->resource = $this->getGraphicLibrary()->crop($this->getResource(), $x, $y, $width, $height);
         $this->resetSize();
         return $this;
     }
