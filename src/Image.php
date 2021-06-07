@@ -159,7 +159,8 @@ class Image
     
     public function resize(int $width, int $height): Image
     {
-        $this->getGraphicLibrary()->resize($this->getResource(), $width, $height);
+        $this->resource = $this->getGraphicLibrary()->resize($this->getResource(), $width, $height);
+        $this->resetSize();
         return $this;
     }
 
@@ -178,7 +179,7 @@ class Image
         int $toWidth,
         int $toHeight
     ) {
-        $this->getGraphicLibrary()->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
+        $this->resource = $this->getGraphicLibrary()->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
         $this->resetSize();
         return $this;
     }
