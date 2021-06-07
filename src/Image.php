@@ -22,12 +22,12 @@ class Image
         'base_url' => '',
         'web_root_dir' => '',
     ];
-
+    
     /** @var array */
     private static $configuration = [];
     
     /** @var mix */
-    private $resource;
+    protected $resource;
     
     /** @var int constant IMAGETYPE_XXX */
     private $type;
@@ -131,7 +131,11 @@ class Image
     public function getWidth(): int
     {
         if (!isset($this->width)) {
-            $this->width = $this->file ? $this->file->getWidth() : null;
+            if (isset($this->resource)) {
+                $this->width = $this->graphicLibrary->getWidth($this->resource);
+            } elseif (isset($this->file)) {
+                $this->width = $this->file->getWidth();
+            }
         }
         return $this->width;
     }    
@@ -139,7 +143,11 @@ class Image
     public function getHeight(): int
     {
         if (!isset($this->height)) {
-            $this->height = $this->file ? $this->file->getHeight() : null;
+            if (isset($this->resource)) {
+                $this->height = $this->graphicLibrary->getHeight($this->resource);
+            } elseif (isset($this->file)) {
+                $this->height = $this->file->getHeight();
+            }
         }
         return $this->height;
     }    
@@ -158,6 +166,7 @@ class Image
     public function crop(int $x, int $y, int $width, int $height): Image
     {
         $this->getGraphicLibrary()->crop($this->getResource(), $x, $y, $width, $height);
+        $this->resetSize();
         return $this;
     }
 
@@ -170,10 +179,11 @@ class Image
         int $toHeight
     ) {
         $this->getGraphicLibrary()->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
+        $this->resetSize();
         return $this;
     }
 
-    private function getGraphicLibrary(): GraphicLibraryInterface
+    protected function getGraphicLibrary(): GraphicLibraryInterface
     {
         if (!isset($this->graphicLibrary)) {
             foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
@@ -193,7 +203,7 @@ class Image
     /**
      * @return mix Depends on graphic library
      */
-    private function getResource()
+    protected function getResource()
     {
         if (!isset($this->resource)) {
             $this->resource = $this->getGraphicLibrary()->open(
@@ -202,5 +212,14 @@ class Image
             );
         }
         return $this->resource;
+    }
+    
+    /**
+     * Unset width and height
+     */
+    protected function resetSize()
+    {
+        $this->width = null;
+        $this->height= null;
     }
 }
