@@ -83,6 +83,22 @@ class Gmagick implements GraphicLibraryInterface
     
     /**
      * @param \Gmagick $image
+     */
+    public function getHeight($image): int
+    {
+        return $image->getimageheight();
+    }
+
+    /**
+     * @param \Gmagick $image
+     */
+    public function getWidth($image): int
+    {
+        return $image->getimagewidth();
+    }
+
+    /**
+     * @param \Gmagick $image
      * @param int $x
      * @param int $y
      * @param int $width

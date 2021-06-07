@@ -75,6 +75,22 @@ class Imagick implements GraphicLibraryInterface
     
     /**
      * @param \Imagick $image
+     */
+    public function getHeight($image): int
+    {
+        return $image->getImageHeight();
+    }
+
+    /**
+     * @param \Imagick $image
+     */
+    public function getWidth($image): int
+    {
+        return $image->getImageWidth();
+    }    
+    
+    /**
+     * @param \Imagick $image
      * @return \Imagick
      */
     public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false)

@@ -45,6 +45,13 @@ abstract class AbstractTest extends TestCase
         $this->assertLessThan(1, CompareImages::distance($savedFile, $src));
         unlink($savedFile);
     }
+    
+    public function testSize(string $src, int $imgType, int $width, int $height)
+    {
+        $resource = $this->instance->open($src, $imgType);
+        $this->assertEquals($width, $this->instance->getWidth($resource));
+        $this->assertEquals($height, $this->instance->getHeight($resource));
+    }
 
     public function testCrop(int $imgType, int $x, int $y, int $width, int $height, string $src, string $expectedFile)
     {

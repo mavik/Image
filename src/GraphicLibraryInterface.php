@@ -40,6 +40,16 @@ interface GraphicLibraryInterface
      * @param mix $image Type depends on graphic library
      */
     public function close($image): void;
+    
+    /**
+     * @param mix $image Type depends on graphic library
+     */
+    public function getWidth($image): int;
+    
+    /**
+     * @param mix $image Type depends on graphic library
+     */
+    public function getHeight($image): int;    
 
     /**
      * @param mix $image Type depends on graphic library

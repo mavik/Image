@@ -104,6 +104,16 @@ class Gd2 implements GraphicLibraryInterface
         }
     }   
     
+    public function getHeight($image): int
+    {
+        return imagesy($image);
+    }
+
+    public function getWidth($image): int
+    {
+        return imagesx($image);
+    }
+
     /**
      * @param resource $image
      * @return resource

@@ -52,6 +52,16 @@ class ImagickTest extends AbstractTest
     }
     
     /**
+     * @covers Mavik\Image\GraphicLibrary\Imagick::getWidth
+     * @covers Mavik\Image\GraphicLibrary\Imagick::getHeight
+     * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::imagesSize
+     */    
+    public function testSize(string $src, int $imgType, int $width, int $height)
+    {
+        parent::testSize($src, $imgType, $width, $height);
+    }
+        
+    /**
      * @covers Mavik\Image\GraphicLibrary\Imagick::crop
      * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::imagesToCrop
      */

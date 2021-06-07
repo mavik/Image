@@ -33,6 +33,16 @@ class Gd2Test extends AbstractTest
     {
         parent::testSave($src, $imgType);
     }
+
+    /**
+     * @covers Mavik\Image\GraphicLibrary\Gd2::getWidth
+     * @covers Mavik\Image\GraphicLibrary\Gd2::getHeight
+     * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::imagesSize
+     */    
+    public function testSize(string $src, int $imgType, int $width, int $height)
+    {
+        parent::testSize($src, $imgType, $width, $height);
+    }
     
     /**
      * @covers Mavik\Image\GraphicLibrary\Gd2::crop
