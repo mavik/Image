@@ -102,6 +102,26 @@ class ImageTest extends TestCase
         $this->assertEquals(500, $image->getHeight());
     }
 
+    /**
+     * @covers Mavik\Image\Image::resize
+     */    
+    public function testResize()
+    {
+        $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+        
+        $image = new Image($origFile);
+        $this->assertEquals(1200, $image->getWidth());
+        $this->assertEquals(1200, $image->getHeight());
+        $image->resize(400, 500)->save($savedFile);
+        
+        $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/resized/apple-400-500.jpg', $savedFile));
+        unlink($savedFile);
+        
+        $this->assertEquals(400, $image->getWidth());
+        $this->assertEquals(500, $image->getHeight());
+    }
+        
     public function imagesToSave()
     {
         return [
