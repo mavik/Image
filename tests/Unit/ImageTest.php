@@ -81,6 +81,27 @@ class ImageTest extends TestCase
         unlink($savedFile);
     }
     
+    /**
+     * @covers Mavik\Image\Image::crop
+     */    
+    public function testCrop()
+    {
+        $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+        
+        $image = new Image($origFile);
+        $this->assertEquals(1200, $image->getWidth());
+        $this->assertEquals(1200, $image->getHeight());
+        $image->crop(25, 40, 400, 500);
+        $image->save($savedFile);
+        
+        $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop/apple-25-40-400-500.jpg', $savedFile));
+        unlink($savedFile);
+        
+        $this->assertEquals(400, $image->getWidth());
+        $this->assertEquals(500, $image->getHeight());
+    }
+
     public function imagesToSave()
     {
         return [
