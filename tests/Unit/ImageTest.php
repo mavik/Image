@@ -92,8 +92,7 @@ class ImageTest extends TestCase
         $image = new Image($origFile);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
-        $image->crop(25, 40, 400, 500);
-        $image->save($savedFile);
+        $image->crop(25, 40, 400, 500)->save($savedFile);
         
         $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop/apple-25-40-400-500.jpg', $savedFile));
         unlink($savedFile);
@@ -121,6 +120,26 @@ class ImageTest extends TestCase
         $this->assertEquals(400, $image->getWidth());
         $this->assertEquals(500, $image->getHeight());
     }
+    
+    /**
+     * @covers Mavik\Image\Image::resize
+     */    
+    public function testCropAndResize()
+    {
+        $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+        
+        $image = new Image($origFile);
+        $this->assertEquals(1200, $image->getWidth());
+        $this->assertEquals(1200, $image->getHeight());
+        $image->cropAndResize(25, 40, 400, 500, 200, 200)->save($savedFile);
+        
+        $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop-and-resize/apple-25-40-400-500-200-200.jpg', $savedFile));
+        unlink($savedFile);
+        
+        $this->assertEquals(200, $image->getWidth());
+        $this->assertEquals(200, $image->getHeight());
+    }    
         
     public function imagesToSave()
     {
