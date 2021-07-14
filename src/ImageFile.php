@@ -136,6 +136,7 @@ class ImageFile
         $context = stream_context_create([
             'http' => [
                 'header' => 'Range: bytes=0-65536',
+                'ignore_errors' => true,
             ]
         ]);        
         $imageData = @file_get_contents($this->url, false, $context, 0, 65536);

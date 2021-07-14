@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Mavik\Image\Tests\HttpServer;
 use Mavik\Image\Tests\CompareImages;
 
-class ImageTest extends TestCase
+class ImageImmutableTest extends TestCase
 {
     
     public static function setUpBeforeClass(): void
@@ -28,18 +28,13 @@ class ImageTest extends TestCase
         ]);
     }
     
-    protected function createImage(string $src): Image
-    {
-        return new Image($src);
-    }
-
     /**
      * @covers Image::getType
      * @dataProvider files
      */
     public function testGetType(string $src, array $info)
     {
-        $image = $this->createImage($src);
+        $image = new ImageImmutable($src);
         $this->assertEquals($info['type'], $image->getType());
     }
 
@@ -49,7 +44,7 @@ class ImageTest extends TestCase
      */
     public function testGetWidth(string $src, array $info)
     {
-        $image = $this->createImage($src);
+        $image = new Image($src);
         $this->assertEquals($info['width'], $image->getWidth());
     }
     
@@ -59,7 +54,7 @@ class ImageTest extends TestCase
      */
     public function testGetHeight(string $src, array $info)
     {
-        $image = $this->createImage($src);
+        $image = new Image($src);
         $this->assertEquals($info['height'], $image->getHeight());
     }    
     
@@ -69,7 +64,7 @@ class ImageTest extends TestCase
      */
     public function testGetFileSize(string $src, array $info)
     {
-        $image = $this->createImage($src);
+        $image = new Image($src);
         $this->assertEquals($info['file_size'], $image->getFileSize());
     }
     
@@ -77,12 +72,12 @@ class ImageTest extends TestCase
      * @covers Image::save
      * @dataProvider imagesToSave
      */
-    public function testSave(string $src)
+    public function testSave(string $origFile)
     {    
-        $savedFile = __DIR__ . '/../temp/' . basename($src);
-        $image = $this->createImage($src);
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+        $image = new Image($origFile);
         $image->save($savedFile);                        
-        $this->assertLessThan(1, CompareImages::distance($src, $savedFile));
+        $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
         unlink($savedFile);
     }
     
@@ -94,7 +89,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = $this->createImage($origFile);
+        $image = new Image($origFile);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
         $image->crop(25, 40, 400, 500)->save($savedFile);
@@ -114,7 +109,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = $this->createImage($origFile);
+        $image = new Image($origFile);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
         $image->resize(400, 500)->save($savedFile);
@@ -133,8 +128,8 @@ class ImageTest extends TestCase
     {
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
-                
-        $image = $this->createImage($origFile);
+        
+        $image = new Image($origFile);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
         $image->cropAndResize(25, 40, 400, 500, 200, 200)->save($savedFile);
