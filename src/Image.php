@@ -24,7 +24,7 @@ class Image
     ];
     
     /** @var array */
-    private static $configuration = [];
+    protected static $configuration = [];
     
     /** @var mix */
     protected $resource;
@@ -39,10 +39,10 @@ class Image
     private $height;
  
     /** @var ImageFile */
-    private $file;
+    protected $file;
     
     /** @var GraphicLibrary */
-    private $graphicLibrary;
+    protected $graphicLibrary;
     
     public static function configure(array $configuration): void
     {

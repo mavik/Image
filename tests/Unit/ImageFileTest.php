@@ -8,8 +8,7 @@ class ImageFileTest extends TestCase
 {   
     public static function setUpBeforeClass(): void
     {
-        $webRoot = __DIR__ . '/../resources/images';
-        HttpServer::start($webRoot);
+        HttpServer::start();
     }
     
     /**

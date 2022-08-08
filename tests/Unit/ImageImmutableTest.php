@@ -17,84 +17,84 @@ use Mavik\Image\Tests\CompareImages;
 // It's needed for testing with images from Wikipedia
 ini_set('user_agent', "UnitTest Bot");
 
-class ImageTest extends TestCase
+class ImageImmutableTest extends TestCase
 {
-
+    
     public static function setUpBeforeClass(): void
     {
         HttpServer::start();
         
-        Image::configure([
+        ImageImmutable::configure([
             'base_url' => 'http://test.com/',
             'web_root_dir' => __DIR__ . '/../resources'
         ]);
     }
     
     /**
-     * @covers Image::getType
+     * @covers ImageImmutable::getType
      * @dataProvider files
      */
     public function testGetType(string $src, array $info)
     {
-        $image = new Image($src);
+        $image = new ImageImmutable($src);
         $this->assertEquals($info['type'], $image->getType());
     }
 
     /**
-     * @covers Image::getWidth
+     * @covers ImageImmutable::getWidth
      * @dataProvider files
      */
     public function testGetWidth(string $src, array $info)
     {
-        $image = new Image($src);
+        $image = new ImageImmutable($src);
         $this->assertEquals($info['width'], $image->getWidth());
     }
     
     /**
-     * @covers Image::getHeight
+     * @covers ImageImmutable::getHeight
      * @dataProvider files
      */
     public function testGetHeight(string $src, array $info)
     {
-        $image = new Image($src);
+        $image = new ImageImmutable($src);
         $this->assertEquals($info['height'], $image->getHeight());
     }    
     
     /**
-     * @covers Image::getFileSize
+     * @covers ImageImmutable::getFileSize
      * @dataProvider files
      */
     public function testGetFileSize(string $src, array $info)
     {
-        $image = new Image($src);
+        $image = new ImageImmutable($src);
         $this->assertEquals($info['file_size'], $image->getFileSize());
     }
     
     /**
-     * @covers Image::save
+     * @covers ImageImmutable::save
      * @dataProvider imagesToSave
      */
-    public function testSave(string $origFile)
+    public function testSave(string $src)
     {    
-        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
-        $image = new Image($origFile);
+        $savedFile = __DIR__ . '/../temp/' . basename($src);
+        $image = new ImageImmutable($src);
         $image->save($savedFile);                        
-        $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
+        $this->assertLessThan(1, CompareImages::distance($src, $savedFile));
         unlink($savedFile);
     }
 
     /**
-     * @covers Image::__clone
+     * @covers ImageImmutable::__clone
      */
     public function testClone()
     {
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
 
-        $image = new Image($origFile);        
-        $image->crop(25, 40, 400, 500);        
-        $newImage = clone $image;
-        $image->crop(50, 50, 50, 50);
+        $image = new ImageImmutable($origFile);
+        $croppedImage = $image->crop(25, 40, 400, 500);
+        $newImage = clone $croppedImage;        
+        $croppedImage->crop(50, 50, 50, 50);
         $newImage->save($savedFile);
         
         $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop/apple-25-40-400-500.jpg', $savedFile));
@@ -102,63 +102,82 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers Mavik\Image\Image::crop
+     * @covers Mavik\Image\ImageImmutable::crop
      */    
     public function testCrop()
     {
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $origSavedFile = __DIR__ . '/../temp/origin-' . basename($origFile);
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = new Image($origFile);
+        $image = new ImageImmutable($origFile);
+        $newImage = $image->crop(25, 40, 400, 500);
+
+        $this->assertEquals(400, $newImage->getWidth());
+        $this->assertEquals(500, $newImage->getHeight());
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
-        $image->crop(25, 40, 400, 500)->save($savedFile);
         
+        $image->save($origSavedFile);        
+        $this->assertLessThan(1, CompareImages::distance($origFile, $origSavedFile));
+        unlink($origSavedFile);
+        
+        $newImage->save($savedFile);        
         $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop/apple-25-40-400-500.jpg', $savedFile));
-        unlink($savedFile);
-        
-        $this->assertEquals(400, $image->getWidth());
-        $this->assertEquals(500, $image->getHeight());
+        unlink($savedFile);        
     }
 
     /**
-     * @covers Mavik\Image\Image::resize
+     * @covers Mavik\Image\ImageImmutable::resize
      */    
     public function testResize()
     {
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $originSavedFile = __DIR__ . '/../temp/origin-' . basename($origFile);
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = new Image($origFile);
+        $image = new ImageImmutable($origFile);
+        $newImage = $image->resize(400, 500);
+    
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
-        $image->resize(400, 500)->save($savedFile);
+        $this->assertEquals(400, $newImage->getWidth());
+        $this->assertEquals(500, $newImage->getHeight());        
+    
+        $image->save($originSavedFile);        
+        $this->assertLessThan(1, CompareImages::distance($originSavedFile, $origFile));
+        unlink($originSavedFile);
         
+        $newImage->save($savedFile);        
         $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/resized/apple-400-500.jpg', $savedFile));
-        unlink($savedFile);
-        
-        $this->assertEquals(400, $image->getWidth());
-        $this->assertEquals(500, $image->getHeight());
+        unlink($savedFile);        
     }
     
     /**
-     * @covers Mavik\Image\Image::resize
+     * @covers Mavik\Image\ImageImmutable::resize
      */    
     public function testCropAndResize()
     {
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $originSavedFile = __DIR__ . '/../temp/origin-' . basename($origFile);
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
                 
-        $image = new Image($origFile);
+        $image = new ImageImmutable($origFile);
+        $newImage = $image->cropAndResize(25, 40, 400, 500, 200, 200);
+        
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
-        $image->cropAndResize(25, 40, 400, 500, 200, 200)->save($savedFile);
+
+        $this->assertEquals(200, $newImage->getWidth());
+        $this->assertEquals(200, $newImage->getHeight());
         
+        $image->save($originSavedFile);
+        $this->assertLessThan(1, CompareImages::distance($originSavedFile, $origFile));
+        unlink($originSavedFile);
+        
+        $newImage->save($savedFile);        
         $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop-and-resize/apple-25-40-400-500-200-200.jpg', $savedFile));
         unlink($savedFile);
-        
-        $this->assertEquals(200, $image->getWidth());
-        $this->assertEquals(200, $image->getHeight());
     }    
         
     public function imagesToSave()

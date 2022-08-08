@@ -3,8 +3,15 @@ namespace Mavik\Image\Tests;
 
 class HttpServer
 {
-    public static function start(string $webRoot): void
+    static $isStarted = false;
+
+    public static function start(): void
     {
+        if (self::$isStarted) {
+            return;
+        } 
+        
+        $webRoot = __DIR__ . '/resources/images';
         shell_exec("php -S localhost:8888 -t {$webRoot} > /dev/null 2>&1 &");
         $count = 0;
         do {
@@ -14,5 +21,7 @@ class HttpServer
         if (empty($content)) {
             throw new \Exception('HTTP server cannot be started');
         }
+        
+        self::$isStarted = true;
     }    
 }
