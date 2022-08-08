@@ -29,7 +29,7 @@ class Gd2 implements GraphicLibraryInterface
     {
         $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
     }
-
+    
     public static function isInstalled(): bool
     {
         return function_exists('imagecreatetruecolor');
@@ -103,6 +103,17 @@ class Gd2 implements GraphicLibraryInterface
             throw new GraphicLibraryException("Can't write image with type '{$type}' to file '{$path}'");
         }
     }   
+
+    /**
+     * @param resource $image
+     * @return resource
+     */
+    public function clone($image)
+    {
+        $width = $this->getWidth($image);
+        $height = $this->getHeight($image);
+        return $this->cropAndResize($image, 0, 0, $width, $height, $width, $height, true);
+    }
     
     public function getHeight($image): int
     {
@@ -113,7 +124,7 @@ class Gd2 implements GraphicLibraryInterface
     {
         return imagesx($image);
     }
-
+    
     /**
      * @param resource $image
      * @return resource

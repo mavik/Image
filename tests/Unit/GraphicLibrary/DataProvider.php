@@ -40,6 +40,13 @@ class DataProvider
         ];
     }
 
+    public static function clone()
+    {
+        return [
+            0 => [__DIR__ . '/../../resources/images/bee.gif', IMAGETYPE_GIF, 549, 619],
+        ];
+    }    
+    
     public static function imagesToCrop()
     {
         return [

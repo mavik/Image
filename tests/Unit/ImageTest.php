@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Mavik\Image\Tests\HttpServer;
 use Mavik\Image\Tests\CompareImages;
 
+ini_set('user_agent', "UnitTest Bot");
+
 class ImageTest extends TestCase
 {
     
@@ -80,7 +82,25 @@ class ImageTest extends TestCase
         $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
         unlink($savedFile);
     }
-    
+
+    /**
+     * @covers Image::__clone
+     */
+    public function testClone()
+    {
+        $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+
+        $image = new Image($origFile);        
+        $image->crop(25, 40, 400, 500);        
+        $newImage = clone $image;
+        $image->crop(50, 50, 50, 50);
+        $newImage->save($savedFile);
+        
+        $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop/apple-25-40-400-500.jpg', $savedFile));
+        unlink($savedFile);
+    }
+
     /**
      * @covers Mavik\Image\Image::crop
      */    
