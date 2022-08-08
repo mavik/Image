@@ -136,13 +136,14 @@ class ImageFile
         $context = stream_context_create([
             'http' => [
                 'header' => 'Range: bytes=0-65536',
+                'ignore_errors' => true,
             ]
         ]);        
         $imageData = @file_get_contents($this->url, false, $context, 0, 65536);
         if ($imageData === false) {
             throw new FileException("Can't open URL \"{$this->url}\"");
         }        
-        // $http_response_header is setted by PHP in file_get_contents()
+        // The special var $http_response_header is setted by PHP in file_get_contents()
         $httpHeaders = $this->parseHttpHeaders($http_response_header);
         $this->fileSize = $this->fileSizeFromHttpHeaders($httpHeaders);
         if (!isset($this->fileSize)) {
