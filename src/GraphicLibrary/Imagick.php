@@ -75,6 +75,15 @@ class Imagick implements GraphicLibraryInterface
     
     /**
      * @param \Imagick $image
+     * @return \Imagick
+     */    
+    public function clone($image)
+    {
+       return clone $image; 
+    }    
+    
+    /**
+     * @param \Imagick $image
      */
     public function getHeight($image): int
     {
@@ -88,7 +97,7 @@ class Imagick implements GraphicLibraryInterface
     {
         return $image->getImageWidth();
     }    
-    
+ 
     /**
      * @param \Imagick $image
      * @return \Imagick

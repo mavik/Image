@@ -15,6 +15,8 @@ use Mavik\Image\Tests\HttpServer;
 use Mavik\Image\Tests\CompareImages;
 use Mavik\Image\GraphicLibraryInterface;
 
+ini_set('user_agent', "UnitTest Bot");
+
 abstract class AbstractTest extends TestCase
 {
     /** @var GraphicLibraryInterface */
@@ -52,6 +54,18 @@ abstract class AbstractTest extends TestCase
         $this->assertEquals($width, $this->instance->getWidth($resource));
         $this->assertEquals($height, $this->instance->getHeight($resource));
     }
+
+    public function testClone(string $src, int $imgType)
+    {
+        $resource = $this->instance->open($src, $imgType);
+        $newResource = $this->instance->clone($resource);
+        $this->instance->crop($resource, 50, 50, 50, 50);
+        $savedFile = __DIR__ . '/../../temp/' . basename($src);
+        $this->instance->save($newResource, $savedFile, $imgType);
+        $this->assertLessThan(1, CompareImages::distance($src, $savedFile));
+        unlink($savedFile);
+    }
+
 
     public function testCrop(int $imgType, int $x, int $y, int $width, int $height, string $src, string $expectedFile)
     {

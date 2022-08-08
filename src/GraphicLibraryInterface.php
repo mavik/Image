@@ -14,7 +14,7 @@ interface GraphicLibraryInterface
     public function __construct(array $configuration = []);
 
     public static function isInstalled(): bool;
-
+    
     /**
      * Returns image - resource or object
      * 
@@ -42,6 +42,12 @@ interface GraphicLibraryInterface
     public function close($image): void;
     
     /**
+     * @param mixed $image Depends on graphic library
+     * @return mixed Image - resource or object, it depends on graphic library
+     */    
+    public function clone($image);    
+        
+    /**
      * @param mix $image Type depends on graphic library
      */
     public function getWidth($image): int;
@@ -49,17 +55,17 @@ interface GraphicLibraryInterface
     /**
      * @param mix $image Type depends on graphic library
      */
-    public function getHeight($image): int;    
-
+    public function getHeight($image): int;
+    
     /**
-     * @param mix $image Type depends on graphic library
-     * @return mix Image - resource or object, it depends on graphic library
+     * @param mixed $image Type depends on graphic library
+     * @return mixed Image - resource or object, it depends on graphic library
      */
     public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false);
 
     /**
-     * @param mix $image Depends on graphic library
-     * @return mix Image - resource or object, it depends on graphic library
+     * @param mixed $image Depends on graphic library
+     * @return mixed Image - resource or object, it depends on graphic library
      */
     public function resize(
         $image, 
@@ -74,8 +80,8 @@ interface GraphicLibraryInterface
      * Some library can do it as one operation,
      * and we don't want use two operations with these libraries
      * 
-     * @param mix $image Type depends on graphic library
-     * @return mix Image - resource or object, it depends on graphic library
+     * @param mixed $image Type depends on graphic library
+     * @return mixed Image - resource or object, it depends on graphic library
      */
     public function cropAndResize(
         $image, 

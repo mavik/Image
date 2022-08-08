@@ -63,6 +63,15 @@ class GmagickTest extends AbstractTest
     {
         parent::testSize($src, $imgType, $width, $height);
     }
+
+    /**
+     * @covers Mavik\Image\GraphicLibrary\Gmagick::clone
+     * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::clone
+     */
+    public function testClone(string $src, int $imgType)
+    {
+        parent::testClone($src, $imgType);        
+    }
     
     /**
      * @covers Mavik\Image\GraphicLibrary\Gmagick::crop

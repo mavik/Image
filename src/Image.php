@@ -223,4 +223,17 @@ class Image
         $this->width = null;
         $this->height= null;
     }
+    
+    public function __clone()
+    {
+        if (isset($this->file)) {
+            $this->file = clone $this->file;
+        }
+        if (isset($this->graphicLibrary)) {
+            $this->graphicLibrary = clone $this->graphicLibrary;
+        }
+        if (isset($this->resource)) {
+            $this->resource = $this->graphicLibrary->clone($this->resource);
+        }
+    }
 }

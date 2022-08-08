@@ -45,6 +45,15 @@ class Gd2Test extends AbstractTest
     }
     
     /**
+     * @covers Mavik\Image\GraphicLibrary\Gd2::clone
+     * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::clone
+     */
+    public function testClone(string $src, int $imgType)
+    {
+        parent::testClone($src, $imgType);        
+    }
+    
+    /**
      * @covers Mavik\Image\GraphicLibrary\Gd2::crop
      * @dataProvider Mavik\Image\Tests\Unit\GraphicLibrary\DataProvider::imagesToCrop
      */

@@ -83,6 +83,15 @@ class Gmagick implements GraphicLibraryInterface
     
     /**
      * @param \Gmagick $image
+     * @return \Gmagick
+     */
+    public function clone($image)
+    {
+        return clone $image;
+    }    
+    
+    /**
+     * @param \Gmagick $image
      */
     public function getHeight($image): int
     {
@@ -96,7 +105,7 @@ class Gmagick implements GraphicLibraryInterface
     {
         return $image->getimagewidth();
     }
-
+    
     /**
      * @param \Gmagick $image
      * @param int $x
