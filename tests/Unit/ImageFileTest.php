@@ -15,7 +15,7 @@ class ImageFileTest extends TestCase
      * @covers ImageFile::getFileSize
      * @dataProvider correctImagesProvider
      */
-    public function testGetFileSize(string $url, string $path = null, array $trueResult)
+    public function testGetFileSize(string $url, string $path = null, array $trueResult = [])
     {        
         $file = new ImageFile($url, $path);
         $fileSize = $file->getFileSize();
@@ -23,32 +23,22 @@ class ImageFileTest extends TestCase
     }
     
     /**
-     * @covers ImageFile::getWidth
+     * @covers ImageFile::getImageSize
      * @dataProvider correctImagesProvider
      */
-    public function testGetWidth(string $url, string $path = null, array $trueResult)
+    public function testGetImageSize(string $url, string $path = null, array $trueResult = [])
     {        
         $file = new ImageFile($url, $path);
-        $width = $file->getWidth();
-        $this->assertEquals($trueResult['width'], $width);
-    }
-    
-    /**
-     * @covers ImageFile::getHeight
-     * @dataProvider correctImagesProvider
-     */
-    public function testGetHeight(string $url, string $path = null, array $trueResult)
-    {        
-        $file = new ImageFile($url, $path);
-        $height = $file->getHeight();
-        $this->assertEquals($trueResult['height'], $height);
+        $imageSize = $file->getImageSize();
+        $this->assertEquals($trueResult['width'], $imageSize->width);
+        $this->assertEquals($trueResult['height'], $imageSize->height);
     }
     
     /**
      * @covers ImageFile::getType
      * @dataProvider correctImagesProvider
      */
-    public function testGetType(string $url, string $path = null, array $trueResult)
+    public function testGetType(string $url, string $path = null, array $trueResult = [])
     {        
         $file = new ImageFile($url, $path);
         $type = $file->getType();

@@ -23,11 +23,8 @@ class ImageFile
     /** @var int */
     private $fileSize;
     
-    /** @var int */
-    private $width;
-
-    /** @var int */
-    private $height;
+    /** @var ImageSize **/
+    private $imageSize;    
     
     /**
      * IMAGETYPE_XXX
@@ -74,20 +71,12 @@ class ImageFile
         return $this->type;
     }
     
-    public function getWidth(): int
+    public function getImageSize(): ImageSize
     {
-        if (!isset($this->width)) {
+        if (!isset($this->imageSize)) {
             $this->initImageInfo();
         }
-        return $this->width;
-    }
-    
-    public function getHeight(): int
-    {
-        if (!isset($this->height)) {
-            $this->initImageInfo();
-        }
-        return $this->height;
+        return $this->imageSize;
     }
 
     private function isUrl(string $file): bool
@@ -95,17 +84,20 @@ class ImageFile
         return preg_match('/^\w+\:\/\//', $file);
     }
     
-    private function initImageInfo()
+    private function initImageInfo(): void
     {
         if ($this->path) {
-            list(
-                $this->width,
-                $this->height,
-                $this->type
-            ) = getimagesize($this->path);
+            $this->initImageInfoFromPath();
         } else {
             $this->initImageInfoFromUrl();
         }
+    }
+    
+    private function initImageInfoFromPath(): void
+    {
+        $imageInfo = getimagesize($this->path);
+        $this->type = $imageInfo[2];
+        $this->imageSize = new ImageSize($imageInfo[0], $imageInfo[1]);
     }
 
     private function initFileSize(): void
@@ -135,7 +127,8 @@ class ImageFile
     {
         $context = stream_context_create([
             'http' => [
-                'header' => 'Range: bytes=0-65536',
+                'header' => "Range: bytes=0-65536\r\n"
+                          . "User-Agent: mavikImage/1.0",
             ]
         ]);        
         $imageData = @file_get_contents($this->url, false, $context, 0, 65536);
@@ -153,8 +146,7 @@ class ImageFile
         if (!isset($imageSize[0]) || !isset($imageSize[1]) || !isset($imageSize[2])) {
             throw new FileException("Can't get size or type of image \"{$this->url}\"");
         }
-        $this->width = $imageSize[0];
-        $this->height = $imageSize[1];
+        $this->imageSize = new ImageSize($imageSize[0], $imageSize[1]);
         $this->type = $imageSize[2];
     }
     

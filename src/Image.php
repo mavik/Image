@@ -31,17 +31,14 @@ class Image
     
     /** @var int constant IMAGETYPE_XXX */
     private $type;
-
-    /** @var int */
-    private $width;
     
-    /** @var int */
-    private $height;
- 
+    /** @var ImageSize **/
+    private $size;
+
     /** @var ImageFile */
     protected $file;
     
-    /** @var GraphicLibrary */
+    /** @var GraphicLibraryInterface */
     protected $graphicLibrary;
     
     public static function configure(array $configuration): void
@@ -127,31 +124,45 @@ class Image
         }
         return $this->type;
     }
+
+    public function getSize(): ImageSize
+    {
+        if (!isset($this->size)) {
+            if (isset($this->resource)) {
+                $this->size = $this->getImageSizeFromResource();
+            } elseif (isset($this->file)) {
+                $this->size = $this->file->getImageSize();
+            } else {
+                throw new LogicException();
+            }
+        }
+        return $this->size;
+    }
     
+    /**
+     * Alias for getSize()->width
+     */
     public function getWidth(): int
     {
-        if (!isset($this->width)) {
-            if (isset($this->resource)) {
-                $this->width = $this->graphicLibrary->getWidth($this->resource);
-            } elseif (isset($this->file)) {
-                $this->width = $this->file->getWidth();
-            }
-        }
-        return $this->width;
-    }    
+        return $this->getSize()->width;
+    }
     
+    /**
+     * Alias for getSize()->height
+     */
     public function getHeight(): int
     {
-        if (!isset($this->height)) {
-            if (isset($this->resource)) {
-                $this->height = $this->graphicLibrary->getHeight($this->resource);
-            } elseif (isset($this->file)) {
-                $this->height = $this->file->getHeight();
-            }
-        }
-        return $this->height;
-    }    
-        
+        return $this->getSize()->height;
+    }
+
+    private function getImageSizeFromResource(): ImageSize
+    {
+        return new ImageSize(
+            $this->graphicLibrary->getWidth($this->resource),
+            $this->graphicLibrary->getHeight($this->resource)
+        );
+    }
+    
     public function getFileSize(): ?int
     {
         return $this->file ? $this->file->getFileSize() : null;
@@ -220,8 +231,7 @@ class Image
      */
     protected function resetSize()
     {
-        $this->width = null;
-        $this->height= null;
+        $this->size = null;
     }
     
     public function __clone()
