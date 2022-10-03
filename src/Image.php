@@ -56,38 +56,36 @@ class Image
     }
 
     /**
-     * @param string $src Path or URL
+     * Instances are created by factory methods
      */
-    public function __construct(string $src = null)
-    {        
-        if (!empty($src)) {
-            $this->open($src);
-        }
-    }
+    private function __construct() {}
     
     /**
-     * Static constructor
+     * Create an instance from file
      * 
      * @param string $src Path or URL
      */
-    public static function make(string $src): Image
+    public static function create(string $src): Image
     {
-        return new self($src);
+        $image = new self();
+        $image->load($src);
+        return $image;
     }
     
     /**
-     * Static constructor
+     * Create an instance from string
      */
-    public static function makeFromString(string $content): Image
+    public static function createFromString(string $content): Image
     {
         $image = new self();
         $image->loadFromString($content);
+        return $image;
     }
         
     /**
      * @param string $src Path or URL
      */
-    public function open(string $src)
+    private function load(string $src)
     {
         $fileName = new FileName($src);
         $this->file = new ImageFile($fileName->getUrl(), $fileName->getPath());
