@@ -84,16 +84,17 @@ class Gd2Test extends AbstractTest
     {           
         $this->expectWarning();
         $imagePath = __DIR__ . '/../../resources/images/apple.jpg';
+        $imageFile = $this->imageFile($imagePath, IMAGETYPE_JPEG);
         
-        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);        
+        $image = $this->instance->load($imageFile);        
         $this->instance->crop($image, 50, 50, 300, 300);
         $this->assertFalse(imagesx($image));
        
-        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);        
+        $image = $this->instance->load($imageFile);        
         $this->instance->resize($image, 300, 300);
         $this->assertFalse(imagesx($image));
         
-        $image = $this->instance->open($imagePath, IMAGETYPE_JPEG);        
+        $image = $this->instance->load($imageFile);
         $this->instance->cropAndResize($image, 50, 50, 600, 600, 300, 300);
         $this->assertFalse(imagesx($image));
     }    

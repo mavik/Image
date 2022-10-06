@@ -17,7 +17,7 @@ class ImageFileTest extends TestCase
      */
     public function testGetFileSize(string $url, string $path = null, array $trueResult = [])
     {        
-        $file = new ImageFile($url, $path);
+        $file = new ImageFile($this->fileName($path, $url));
         $fileSize = $file->getFileSize();
         $this->assertEquals($trueResult['file_size'], $fileSize);
     }
@@ -28,7 +28,7 @@ class ImageFileTest extends TestCase
      */
     public function testGetImageSize(string $url, string $path = null, array $trueResult = [])
     {        
-        $file = new ImageFile($url, $path);
+        $file = new ImageFile($this->fileName($path, $url));
         $imageSize = $file->getImageSize();
         $this->assertEquals($trueResult['width'], $imageSize->width);
         $this->assertEquals($trueResult['height'], $imageSize->height);
@@ -40,7 +40,7 @@ class ImageFileTest extends TestCase
      */
     public function testGetType(string $url, string $path = null, array $trueResult = [])
     {        
-        $file = new ImageFile($url, $path);
+        $file = new ImageFile($this->fileName($path, $url));
         $type = $file->getType();
         $this->assertEquals($trueResult['type'], $type);
     }
@@ -52,10 +52,18 @@ class ImageFileTest extends TestCase
     public function testImageFileGetFileSize_WrongImages(string $url, string $path = null, string $messageRegExp)
     {
         $this->expectExceptionMessageMatches($messageRegExp);        
-        $file = new ImageFile($url, $path);
+        $file = new ImageFile($this->fileName($path, $url));
         $file->getFileSize();
     }
 
+    protected function fileName($path, $url): FileName
+    {
+        $fileName = $this->createMock(FileName::class);
+        $fileName->method('getPath')->willReturn($path);
+        $fileName->method('getUrl')->willReturn($url);
+        return $fileName;
+    }    
+    
     public function correctImagesProvider()
     {
         return [

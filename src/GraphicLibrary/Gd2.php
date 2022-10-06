@@ -11,6 +11,7 @@ namespace Mavik\Image\GraphicLibrary;
 
 use Mavik\Image\GraphicLibraryInterface;
 use Mavik\Image\Exception\GraphicLibraryException;
+use Mavik\Image\ImageFile;
 
 class Gd2 implements GraphicLibraryInterface
 {
@@ -22,12 +23,17 @@ class Gd2 implements GraphicLibraryInterface
 
     private $configuration = [];
     
-    /** @var int IMAGETYPE_XXX */
-    private $imageType;
+    /** @var array|SplObjectStorage */
+    private $typesMap;
 
     public function __construct(array $configuration = [])
     {
         $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
+        if (PHP_VERSION_ID >= 80000) {
+            $this->typesMap = new SplObjectStorage();
+        } else {
+            $this->typesMap = [];
+        }
     }
     
     public static function isInstalled(): bool
@@ -36,14 +42,42 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param string $src
+     * @param resource|GdImage $image
      * @param int $type IMAGETYPE_XXX
-     * @return recource
+     */
+    private function mapType($image, int $type): void
+    {
+        $key = is_object($image) ? $image : (string)$image;
+        $this->typesMap[$key] = $type;
+    }
+
+    /**
+     * @param resource|GdImage $image
+     * @return int IMAGETYPE_XXX
+     */
+    private function getType($image): int
+    {
+        $key = is_object($image) ? $image : (string)$image;
+        return $this->typesMap[$key];
+    }
+    
+    /**
+     * @param resource|GdImage $image
+     */
+    private function unmapType($image): void
+    {
+        $key = is_object($image) ? $image : (string)$image;
+        unset($this->typesMap[$key]);
+    }
+
+    /**
+     * @return resource|GDImage
      * @throws GraphicLibraryException
      */
-    public function open(string $src, int $type)
+    public function load(ImageFile $file)
     {
-        $this->imageType = $type;
+        $src = $file->getPath() ?: $file->getUrl();
+        $type = $file->getType();        
         switch ($type)
         {
             case IMAGETYPE_JPEG:
@@ -61,23 +95,43 @@ class Gd2 implements GraphicLibraryInterface
                 break;
             default:
                 throw new GraphicLibraryException('Trying to open unsupported type of image ' . image_type_to_mime_type($type));
-        }
+        }        
         if (!is_resource($image)) {
             throw new GraphicLibraryException("Cannot open image \"{$src}\"");
         }
+        $this->mapType($image, $type);
+        return $image;
+    }
+    
+    /**
+     * Load image from binary string
+     * 
+     * @return resource|GDImage
+     * @throws GraphicLibraryException
+     */
+    public function loadFromString(string $content)
+    {
+        $image = imagecreatefromstring($content);
+        if (!$image) {
+            throw new GraphicLibraryException("Cannot load the string as an image");
+        }
+        $info = getimagesizefromstring($content);
+        $this->mapType($image, $info[2]);
         return $image;
     }
 
+    /**
+     * @param resource|GDImage $image
+     */
     public function close($image): void
     {
+        $this->unmapType($image);
         imagedestroy($image);
     }
     
     /**
-     * @param resource $image
-     * @param string $path
+     * @param resource|GDImage $image
      * @param int $type IMAGETYPE_XXX
-     * @return void
      * @throws GraphicLibraryException
      */
     public function save($image, string $path, int $type): void
@@ -105,33 +159,42 @@ class Gd2 implements GraphicLibraryInterface
     }   
 
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|GDImage $image
+     * @return resource|GDImage
      */
     public function clone($image)
     {
         $width = $this->getWidth($image);
         $height = $this->getHeight($image);
-        return $this->cropAndResize($image, 0, 0, $width, $height, $width, $height, true);
+        $newImage = $this->cropAndResize($image, 0, 0, $width, $height, $width, $height, true);
+        $this->mapType($newImage, $this->getType($image));
+        return $newImage;
     }
-    
+
+    /**
+     * @param resource|GDImage $image
+     */
     public function getHeight($image): int
     {
         return imagesy($image);
     }
 
+    /**
+     * @param resource|GDImage $image
+     */
     public function getWidth($image): int
     {
         return imagesx($image);
     }
-    
+
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|GDImage $image
+     * @return resource|GDImage
      */
     public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false)
     {
-        if ($this->imageType == IMAGETYPE_JPEG || $this->imageType == IMAGETYPE_WBMP) {
+        $imageType = $this->getType($image);
+        if ($imageType == IMAGETYPE_JPEG || $imageType == IMAGETYPE_WBMP) {
             $newImage = imagecrop($image, [
                 'x' => $x,
                 'y' => $y,
@@ -139,8 +202,9 @@ class Gd2 implements GraphicLibraryInterface
                 'height' => $height
             ]);                        
             if (!$immutable) {
-                imagedestroy($image);
+                $this->close($image);
             }
+            $this->mapType($newImage, $imageType);
             return $newImage;
         } else {
             // imagecrop works incorrect with indexed images with transparent
@@ -149,8 +213,8 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|GDImage $image
+     * @return resource|GDImage
      */
     public function resize($image, int $width, int $height, bool $immutable = false)
     {
@@ -158,8 +222,8 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|GDImage $image
+     * @return resource|GDImage
      */
     public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable = false)
     {
@@ -171,13 +235,15 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|GDImage $image
+     * @return resource|GDImage
      */
     private function cropAndResizeTrueColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable)
     {
+        $imageType = $this->getType($image);
         $newImage = imagecreatetruecolor($toWidth, $toHeight);
-        if ($this->imageType != IMAGETYPE_JPEG) {
+        $this->mapType($newImage, $imageType);
+        if ($imageType != IMAGETYPE_JPEG) {
             imagealphablending($newImage, false);
             imagesavealpha($newImage, true);
             $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
@@ -185,18 +251,19 @@ class Gd2 implements GraphicLibraryInterface
         }
         imagecopyresampled($newImage, $image, 0, 0, $x, $y, $toWidth, $toHeight, $width, $height);
         if (!$immutable) {
-            imagedestroy($image);
+            $this->close($image);
         }
         return $newImage;
     }
     
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|GDImage $image
+     * @return resource|GDImage
      */
     private function cropAndResizeIndexedColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable)
     {
         $newImage = imagecreatetruecolor($toWidth, $toHeight);
+        $this->mapType($newImage, $this->getType($image));
         
         $transparentIndex = imagecolortransparent($image);
         if ($transparentIndex >= 0) {
@@ -212,7 +279,7 @@ class Gd2 implements GraphicLibraryInterface
         imagetruecolortopalette($newImage, false, $colorNumbers);
         
         if (!$immutable) {
-            imagedestroy($image);
+            $this->close($image);
         }
         return $newImage;        
     }

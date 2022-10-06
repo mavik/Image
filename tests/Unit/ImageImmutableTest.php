@@ -36,7 +36,7 @@ class ImageImmutableTest extends TestCase
      */
     public function testGetType(string $src, array $info)
     {
-        $image = new ImageImmutable($src);
+        $image = ImageImmutable::create($src);
         $this->assertEquals($info['type'], $image->getType());
     }
 
@@ -46,7 +46,7 @@ class ImageImmutableTest extends TestCase
      */
     public function testGetWidth(string $src, array $info)
     {
-        $image = new ImageImmutable($src);
+        $image = ImageImmutable::create($src);
         $this->assertEquals($info['width'], $image->getWidth());
     }
     
@@ -56,7 +56,7 @@ class ImageImmutableTest extends TestCase
      */
     public function testGetHeight(string $src, array $info)
     {
-        $image = new ImageImmutable($src);
+        $image = ImageImmutable::create($src);
         $this->assertEquals($info['height'], $image->getHeight());
     }    
     
@@ -66,7 +66,7 @@ class ImageImmutableTest extends TestCase
      */
     public function testGetFileSize(string $src, array $info)
     {
-        $image = new ImageImmutable($src);
+        $image = ImageImmutable::create($src);
         $this->assertEquals($info['file_size'], $image->getFileSize());
     }
     
@@ -77,7 +77,7 @@ class ImageImmutableTest extends TestCase
     public function testSave(string $src)
     {    
         $savedFile = __DIR__ . '/../temp/' . basename($src);
-        $image = new ImageImmutable($src);
+        $image = ImageImmutable::create($src);
         $image->save($savedFile);                        
         $this->assertLessThan(1, CompareImages::distance($src, $savedFile));
         unlink($savedFile);
@@ -91,7 +91,7 @@ class ImageImmutableTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
 
-        $image = new ImageImmutable($origFile);
+        $image = ImageImmutable::create($origFile);
         $croppedImage = $image->crop(25, 40, 400, 500);
         $newImage = clone $croppedImage;        
         $croppedImage->crop(50, 50, 50, 50);
@@ -110,7 +110,7 @@ class ImageImmutableTest extends TestCase
         $origSavedFile = __DIR__ . '/../temp/origin-' . basename($origFile);
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = new ImageImmutable($origFile);
+        $image = ImageImmutable::create($origFile);
         $newImage = $image->crop(25, 40, 400, 500);
 
         $this->assertEquals(400, $newImage->getWidth());
@@ -136,7 +136,7 @@ class ImageImmutableTest extends TestCase
         $originSavedFile = __DIR__ . '/../temp/origin-' . basename($origFile);
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = new ImageImmutable($origFile);
+        $image = ImageImmutable::create($origFile);
         $newImage = $image->resize(400, 500);
     
         $this->assertEquals(1200, $image->getWidth());
@@ -162,7 +162,7 @@ class ImageImmutableTest extends TestCase
         $originSavedFile = __DIR__ . '/../temp/origin-' . basename($origFile);
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
                 
-        $image = new ImageImmutable($origFile);
+        $image = ImageImmutable::create($origFile);
         $newImage = $image->cropAndResize(25, 40, 400, 500, 200, 200);
         
         $this->assertEquals(1200, $image->getWidth());

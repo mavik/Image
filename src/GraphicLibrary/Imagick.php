@@ -11,6 +11,7 @@ namespace Mavik\Image\GraphicLibrary;
 
 use Mavik\Image\GraphicLibraryInterface;
 use Mavik\Image\Exception\GraphicLibraryException;
+use Mavik\Image\ImageFile;
 
 class Imagick implements GraphicLibraryInterface
 {
@@ -43,15 +44,34 @@ class Imagick implements GraphicLibraryInterface
     }
     
     /**
-     * @param int $type IMAGETYPE_XXX
-     * @return \Imagick
+     * @throws GraphicLibraryException
      */
-    public function open(string $src, int $type)
+    public function load(ImageFile $imageFile): \Imagick
     {
-        $this->type = $type;
-        return new \Imagick($src);
+        try {
+            $this->type = $imageFile->getType();
+            return new \Imagick($imageFile->getPath() ?: $imageFile->getUrl());
+        } catch (\Exception $e) {
+            throw new GraphicLibraryException($e->getMessage());
+        }
     }
-    
+
+    /**
+     * Load image from binary string
+     * 
+     * @throws GraphicLibraryException
+     */    
+    public function loadFromString(string $content): \Imagick
+    {
+        try {
+            $image = new \Imagick();
+            $image->readImageBlob($content);
+        } catch (\Exception $e) {
+            throw new GraphicLibraryException($e->getMessage());
+        }
+        return $image;
+    }    
+
     /**
      * @param \Imagick $image
      */
@@ -72,16 +92,15 @@ class Imagick implements GraphicLibraryInterface
         }
         $image->writeImage($path);
     }
-    
+
     /**
      * @param \Imagick $image
-     * @return \Imagick
-     */    
-    public function clone($image)
+     */
+    public function clone($image): \Imagick
     {
        return clone $image; 
     }    
-    
+
     /**
      * @param \Imagick $image
      */
@@ -100,9 +119,8 @@ class Imagick implements GraphicLibraryInterface
  
     /**
      * @param \Imagick $image
-     * @return \Imagick
      */
-    public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false)
+    public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false): \Imagick
     {
         $tmpImage = $immutable ? clone $image : $image;
         $tmpImage->cropImage($width, $height, $x, $y);        
@@ -117,7 +135,7 @@ class Imagick implements GraphicLibraryInterface
      * @param \Imagick $image
      * @throws GraphicLibraryException
      */
-    public function resize($image, int $width, int $height, bool $immutable = false)
+    public function resize($image, int $width, int $height, bool $immutable = false): \Imagick
     {
         $tmpImage = $immutable ? clone $image : $image;
         if (!$tmpImage->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1)) {
@@ -125,12 +143,11 @@ class Imagick implements GraphicLibraryInterface
         }
         return $tmpImage;
     }
-    
+
     /**
      * @param \Imagick $image
-     * @return \Imagick
      */
-    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight, bool $immutable = false)
+    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight, bool $immutable = false): \Imagick
     {
         $tmpImage = $immutable ? clone $image : $image;        
         $cropedImage = $this->crop($tmpImage, $x, $y, $width, $height);

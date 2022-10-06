@@ -16,19 +16,23 @@ interface GraphicLibraryInterface
     public static function isInstalled(): bool;
     
     /**
-     * Returns image - resource or object
+     * Load image from file
      * 
-     * @param string $src Url or path to image
-     * @param int $type IMAGETYPE_XXX
-     * @return mix Type depends on graphic library
+     * @return mix Resource or object, depends on graphic library
      */
-    public function open(string $src, int $type);
+    public function load(ImageFile $file);
+    
+    /**
+     * Load image from binary string
+     * 
+     * @return mix Resource or object, depends on graphic library
+     */
+    public function loadFromString(string $content);
 
     /**
      * Save image to file
      * 
      * @param mix $image Type depends on graphic library
-     * @param string $path
      * @param int $type IMAGETYPE_XXX
      * @return void
      */
@@ -40,13 +44,13 @@ interface GraphicLibraryInterface
      * @param mix $image Type depends on graphic library
      */
     public function close($image): void;
-    
+
     /**
      * @param mixed $image Depends on graphic library
      * @return mixed Image - resource or object, it depends on graphic library
      */    
-    public function clone($image);    
-        
+    public function clone($image);
+
     /**
      * @param mix $image Type depends on graphic library
      */

@@ -16,15 +16,25 @@ class ImageImmutable extends Image
 {
     private $flagCloneResourceWhenCloning = true;
 
-    public function resize(int $width, int $height): ImageImmutable
+    public static function create(string $src): self
     {
-        $newResource = $this->getGraphicLibrary()->resize($this->getResource(), $width, $height, true);
+        return parent::create($src);
+    }
+
+    public static function createFromString(string $content): self
+    {
+        return parent::createFromString($content);
+    }
+
+    public function resize(int $width, int $height): self
+    {
+        $newResource = $this->graphicLibrary->resize($this->getResource(), $width, $height, true);
         return $this->cloneWithNewResource($newResource);
     }
 
-    public function crop(int $x, int $y, int $width, int $height): ImageImmutable
+    public function crop(int $x, int $y, int $width, int $height): self
     {
-        $newResource = $this->getGraphicLibrary()->crop($this->getResource(), $x, $y, $width, $height, true);
+        $newResource = $this->graphicLibrary->crop($this->getResource(), $x, $y, $width, $height, true);
         return $this->cloneWithNewResource($newResource);
     }
 
@@ -35,12 +45,13 @@ class ImageImmutable extends Image
         int $height,
         int $toWidth,
         int $toHeight
-    ) {
-        $newResource = $this->getGraphicLibrary()->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight, true);
+    ): self
+    {
+        $newResource = $this->graphicLibrary->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight, true);
         return $this->cloneWithNewResource($newResource);
     }
 
-    private function cloneWithNewResource($resource): ImageImmutable
+    private function cloneWithNewResource($resource): self
     {
         $this->flagCloneResourceWhenCloning = false;
         $newImage = clone $this;

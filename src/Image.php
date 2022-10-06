@@ -55,53 +55,42 @@ class Image
         ]);
     }
 
-    /**
-     * Instances are created by factory methods
-     */
-    private function __construct() {}
+    private function __construct() {
+        $this->initGraphicLibrary();
+    }
     
     /**
-     * Create an instance from file
+     * Create an instance from the file
      * 
      * @param string $src Path or URL
      */
-    public static function create(string $src): Image
+    public static function create(string $src): self
     {
-        $image = new self();
-        $image->load($src);
+        $fileName = new FileName($src);
+        $imageFile = new ImageFile($fileName);
+        $image = new static();
+        $image->file = $imageFile;
         return $image;
     }
     
     /**
-     * Create an instance from string
+     * Create an instance from the string
      */
-    public static function createFromString(string $content): Image
+    public static function createFromString(string $content): self
     {
-        $image = new self();
-        $image->loadFromString($content);
+        $image = new static();
+        $image->resource = $image->graphicLibrary->loadFromString($content);
+        $info = getimagesizefromstring($content);
+        $image->type = $info[2];
         return $image;
-    }
-        
-    /**
-     * @param string $src Path or URL
-     */
-    private function load(string $src)
-    {
-        $fileName = new FileName($src);
-        $this->file = new ImageFile($fileName->getUrl(), $fileName->getPath());
     }
 
     public function save(string $path): Image
     {
-        $this->getGraphicLibrary()->save($this->getResource(), $path, $this->getType());
+        $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
         return $this;
     }    
-    
-    public function close(): void
-    {
-        $this->getGraphicLibrary()->close($this->getResource());
-    }
-    
+
     public function getUrl(): ?string
     {
         return $this->file ? $this->file->getUrl() : null;
@@ -113,12 +102,12 @@ class Image
     }
     
     /**
-     * @return int IMAGETYPE_XXX
+     * @return int|null IMAGETYPE_XXX
      */
     public function getType(): int
     {
         if (!isset($this->type)) {
-            $this->type = $this->file ? $this->file->getType() : null;
+            $this->type = $this->file->getType();
         }
         return $this->type;
     }
@@ -126,6 +115,7 @@ class Image
     public function getSize(): ImageSize
     {
         if (!isset($this->size)) {
+            // Resource is not creating in constructor
             if (isset($this->resource)) {
                 $this->size = $this->getImageSizeFromResource();
             } elseif (isset($this->file)) {
@@ -168,14 +158,14 @@ class Image
     
     public function resize(int $width, int $height): Image
     {
-        $this->resource = $this->getGraphicLibrary()->resize($this->getResource(), $width, $height);
+        $this->resource = $this->graphicLibrary->resize($this->getResource(), $width, $height);
         $this->resetSize();
         return $this;
     }
 
     public function crop(int $x, int $y, int $width, int $height): Image
     {
-        $this->resource = $this->getGraphicLibrary()->crop($this->getResource(), $x, $y, $width, $height);
+        $this->resource = $this->graphicLibrary->crop($this->getResource(), $x, $y, $width, $height);
         $this->resetSize();
         return $this;
     }
@@ -188,26 +178,23 @@ class Image
         int $toWidth,
         int $toHeight
     ) {
-        $this->resource = $this->getGraphicLibrary()->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
+        $this->resource = $this->graphicLibrary->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
         $this->resetSize();
         return $this;
     }
 
-    protected function getGraphicLibrary(): GraphicLibraryInterface
+    protected function initGraphicLibrary(): void
     {
-        if (!isset($this->graphicLibrary)) {
-            foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
-                $className = 'Mavik\\Image\\GraphicLibrary\\' . ucfirst(strtolower($libraryName));
-                if (class_exists($className, true) && $className::isInstalled()) {
-                    $this->graphicLibrary = new $className(self::$configuration['graphic_library']);
-                    break;
-                }
-            }
-            if (!isset($this->graphicLibrary)) {
-                throw new Exception\ConfigurationException('Configuration error: None of the required graphics libraries are installed.');
+        foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
+            $className = 'Mavik\\Image\\GraphicLibrary\\' . ucfirst(strtolower($libraryName));
+            if (class_exists($className, true) && $className::isInstalled()) {
+                $this->graphicLibrary = new $className(self::$configuration['graphic_library']);
+                break;
             }
         }
-        return $this->graphicLibrary;
+        if (!isset($this->graphicLibrary)) {
+            throw new Exception\ConfigurationException('Configuration error: None of the required graphics libraries are installed.');
+        }
     }
     
     /**
@@ -216,10 +203,7 @@ class Image
     protected function getResource()
     {
         if (!isset($this->resource)) {
-            $this->resource = $this->getGraphicLibrary()->open(
-                $this->file->getPath() ?? $this->file->getUrl(),
-                $this->getType()
-            );
+            $this->resource = $this->graphicLibrary->load($this->file);
         }
         return $this->resource;
     }
@@ -227,7 +211,7 @@ class Image
     /**
      * Unset width and height
      */
-    protected function resetSize()
+    protected function resetSize(): void
     {
         $this->size = null;
     }

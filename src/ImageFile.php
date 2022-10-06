@@ -11,6 +11,7 @@
 namespace Mavik\Image;
 
 use Mavik\Image\Exception\FileException;
+use Mavik\Image\FileName;
 
 class ImageFile
 {
@@ -33,13 +34,10 @@ class ImageFile
      */
     private $type;
     
-    public function __construct(string $url= null, string $path = null)
+    public function __construct(FileName $fileName)
     {
-        if(empty($url) && empty($path)) {
-            throw new FileException('URL and path can\'n by empty at the same time.');
-        }
-        $this->path = $path;
-        $this->url = $url;
+        $this->path = $fileName->getPath();
+        $this->url = $fileName->getUrl();
     }
     
     public function getPath(): ?string
@@ -79,11 +77,6 @@ class ImageFile
         return $this->imageSize;
     }
 
-    private function isUrl(string $file): bool
-    {
-        return preg_match('/^\w+\:\/\//', $file);
-    }
-    
     private function initImageInfo(): void
     {
         if ($this->path) {

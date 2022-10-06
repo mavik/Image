@@ -10,6 +10,8 @@
 namespace Mavik\Image\GraphicLibrary;
 
 use Mavik\Image\GraphicLibraryInterface;
+use Mavik\Image\ImageFile;
+use Mavik\Image\Exception\GraphicLibraryException;
 
 class Gmagick implements GraphicLibraryInterface
 {
@@ -39,11 +41,9 @@ class Gmagick implements GraphicLibraryInterface
     }
     
     /**
-     * @param string $src
-     * @param int $type IMAGETYPE_XXX
-     * @return \Gmagick
+     * @throws GraphicLibraryException
      */
-    public function open(string $src, int $type)
+    public function load(ImageFile $imageFile): \Gmagick
     {
         /**
          * We cannot use
@@ -55,13 +55,41 @@ class Gmagick implements GraphicLibraryInterface
          * $image = new \Gmagick();
          * return $image->readimagefile($fp);
          * because it causes Segmentation fault.
-         * 
-         * Only that works correct.
          */ 
         $image = new \Gmagick();
-        return $image->readimageblob(file_get_contents($src));
+        try {
+            if ($imageFile->getPath()) {
+                $image->readimage($imageFile->getPath());
+            } else {
+                $context = stream_context_create([
+                    'http' => [
+                        'header' => "User-Agent: mavikImage/1.0",
+                    ]
+                ]);   
+                $image->readimageblob(file_get_contents($imageFile->getUrl(), false, $context));
+            }
+        } catch (\Exception $e) {
+            throw new GraphicLibraryException($e->getMessage());
+        }
+        return $image;
     }
     
+    /**
+     * Load image from binary string
+     * 
+     * @throws GraphicLibraryException
+     */    
+    public function loadFromString(string $content): \Gmagick
+    {
+        try {
+            $image = new \Gmagick();
+            $image->readimageblob($content);
+        } catch (\Exception $e) {
+            throw new GraphicLibraryException($e->getMessage());
+        }
+        return $image;
+    }
+
     public function close($image): void
     {
         unset($image);
@@ -69,7 +97,6 @@ class Gmagick implements GraphicLibraryInterface
 
     /**
      * @param \Gmagick $image
-     * @param string $path
      * @param int $type IMAGETYPE_XXX
      * @throws GraphicLibraryException
      */
@@ -80,16 +107,15 @@ class Gmagick implements GraphicLibraryInterface
         }
         $image->writeimage($path);
     }
-    
+
     /**
      * @param \Gmagick $image
-     * @return \Gmagick
      */
-    public function clone($image)
+    public function clone($image): \Gmagick
     {
         return clone $image;
     }    
-    
+
     /**
      * @param \Gmagick $image
      */
@@ -108,11 +134,6 @@ class Gmagick implements GraphicLibraryInterface
     
     /**
      * @param \Gmagick $image
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     * @param int $height
-     * @return \Gmagick
      */
     public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false): \Gmagick
     {
@@ -120,10 +141,9 @@ class Gmagick implements GraphicLibraryInterface
         $tmpImage->cropImage($width, $height, $x, $y);
         return $tmpImage;
     }
-    
+
     /**
      * @param \Gmagick $image
-     * @return \Gmagick
      */
     public function resize($image, int $width, int $height, bool $immutable = false): \Gmagick
     {
@@ -134,9 +154,8 @@ class Gmagick implements GraphicLibraryInterface
 
     /**
      * @param \Gmagick $image
-     * @return \Gmagick
      */
-    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight, bool $immutable = false)
+    public function cropAndResize($image, $x, $y, $width, $height, $toWidth, $toHeight, bool $immutable = false): \Gmagick
     {
         $tmpImage = $immutable ? clone $image : $image;
         $cropedImage = $this->crop($tmpImage, $x, $y, $width, $height);

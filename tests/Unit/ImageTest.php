@@ -29,7 +29,7 @@ class ImageTest extends TestCase
             'web_root_dir' => __DIR__ . '/../resources'
         ]);
     }
-    
+
     /**
      * @covers Image::getType
      * @dataProvider files
@@ -96,6 +96,17 @@ class ImageTest extends TestCase
         $this->assertLessThan(1, CompareImages::distance(__DIR__ . '/../resources/images/crop/apple-25-40-400-500.jpg', $savedFile));
         unlink($savedFile);
     }
+    
+    public function testCreateFromString()
+    {
+        $origFile = __DIR__ . '/../resources/images/apple.jpg';
+        $savedFile = __DIR__ . '/../temp/' . basename($origFile);
+        
+        $image = Image::createFromString(file_get_contents($origFile));
+        $image->save($savedFile);
+        $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
+        unlink($savedFile);
+    }    
 
     /**
      * @covers Mavik\Image\Image::crop
