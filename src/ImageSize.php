@@ -22,6 +22,9 @@ class ImageSize
         if (empty($width) && empty($height)) {
             throw new Exception('At least one parameter of ImageSize constructor has to be not null.');
         }
+        if ($width < 0 || $height < 0) {
+            throw new Exception('Width and height cannot be less than zero.');
+        }
         $this->width = $width;
         $this->height = $height;
     }
