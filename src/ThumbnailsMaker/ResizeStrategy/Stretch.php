@@ -20,7 +20,7 @@ class Stretch implements ResizeStrategyInterface
         return new ImageArea(0, 0, $originalSize->width, $originalSize->height);
     }
     
-    public function thumbnailSize(ImageSize $originalSize, ImageSize $thumbnailSize): ImageSize
+    public function realThumbnailSize(ImageSize $originalSize, ImageSize $thumbnailSize): ImageSize
     {
         return $thumbnailSize;
     }

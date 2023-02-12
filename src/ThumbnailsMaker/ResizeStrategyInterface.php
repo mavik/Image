@@ -15,5 +15,5 @@ use Mavik\Image\ImageSize;
 interface ResizeStrategyInterface 
 {
     public function originalImageArea(ImageSize $originalSize, ImageSize $thumbnailSize): ImageArea; 
-    public function thumbnailSize(ImageSize $originalSize, ImageSize $thumbnailSize): ImageSize;
+    public function realThumbnailSize(ImageSize $originalSize, ImageSize $thumbnailSize): ImageSize;
 }

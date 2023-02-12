@@ -29,12 +29,12 @@ class StretchTest extends TestCase
         $this->assertSame(600, $originalArea->height);
     }
     
-    public function testThumbnailSize()
+    public function testRealThumbnailSize()
     {
         $strategy = new Stretch();
         $originalSize = new ImageSize(800, 600);
         $thumbnailSize = new ImageSize(200, 300);
-        $realThumbnailSize = $strategy->thumbnailSize($originalSize, $thumbnailSize);
+        $realThumbnailSize = $strategy->realThumbnailSize($originalSize, $thumbnailSize);
         $this->assertSame(200, $realThumbnailSize->width);
         $this->assertSame(300, $realThumbnailSize->height);        
     }
