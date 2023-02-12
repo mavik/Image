@@ -11,14 +11,17 @@ namespace Mavik\Image;
 
 class ImageSize
 {
-    /** @var int **/
+    /** @var int|null **/
     public $width;
     
-    /** @var int **/
+    /** @var int|null **/
     public $height;    
     
-    public function __construct(int $width, int $height)
+    public function __construct(?int $width = null, ?int $height = null)
     {
+        if (empty($width) && empty($height)) {
+            throw new Exception('At least one parameter of ImageSize constructor has to be not null.');
+        }
         $this->width = $width;
         $this->height = $height;
     }
