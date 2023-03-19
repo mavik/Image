@@ -1,0 +1,55 @@
+<?php
+/*
+ *  PHP Library for Image processing and creating thumbnails
+ *  
+ *  @package Mavik\Image
+ *  @author Vitalii Marenkov <admin@mavik.com.ua>
+ *  @copyright 2021 Vitalii Marenkov
+ *  @license MIT; see LICENSE
+ */
+namespace Mavik\Image\ThumbnailsMaker\ResizeStrategy;
+
+use Mavik\Image\ImageSize;
+use Mavik\Image\ThumbnailsMaker\ImageArea;
+use Mavik\Image\ThumbnailsMaker\ResizeStrategyInterface;
+use Mavik\Image\Exception;
+
+class Fill implements ResizeStrategyInterface
+{
+    public function originalImageArea(ImageSize $originalSize, ImageSize $thumbnailSize): ImageArea
+    {
+        if (empty($thumbnailSize->width) || empty($thumbnailSize->height)) {
+            return new ImageArea(0, 0, $originalSize->width, $originalSize->height);
+        }        
+        if ($originalSize->width/$originalSize->height < $thumbnailSize->width/$thumbnailSize->height) {
+                $x = 0;
+                $widht = $originalSize->width;
+                $height = round($thumbnailSize->height * $widht/$thumbnailSize->width);
+                $y = round(($originalSize->height - $height)/2);
+        } else {
+                $y = 0;
+                $height = $originalSize->height;
+                $widht = round($thumbnailSize->width * $height/$thumbnailSize->height);
+                $x = round(($originalSize->width - $widht)/2);
+        }
+        return new ImageArea($x, $y, $widht, $height);
+    }
+    
+    public function realThumbnailSize(ImageSize $originalSize, ImageSize $thumbnailSize): ImageSize
+    {
+        if ($thumbnailSize->width && $thumbnailSize->height) {
+            return $thumbnailSize;
+        } elseif ($thumbnailSize->width) {
+            return new ImageSize(
+                $thumbnailSize->width,
+                round($originalSize->height * $thumbnailSize->width / $originalSize->width)
+            );
+        } elseif ($thumbnailSize->height) {
+            return new ImageSize(
+                round($originalSize->width * $thumbnailSize->height / $originalSize->height),
+                $thumbnailSize->height
+            );
+        }
+        throw new Exception('Cannot calculate thumbnail size in ResizeStrategy\Fill::thumbnailSize');
+    }
+}
