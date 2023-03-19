@@ -43,7 +43,11 @@ class Fit implements ResizeStrategyInterface
      */
     private function usingDimension(ImageSize $originalSize, ImageSize $thumbnailSize): string
     {
-        if ($thumbnailSize->width && round($originalSize->width/$thumbnailSize->width) >= round($originalSize->height/$thumbnailSize->height)) {
+        if (
+            empty($thumbnailSize->height) || 
+            $thumbnailSize->width && 
+            round($originalSize->width/$thumbnailSize->width) >= round($originalSize->height/$thumbnailSize->height)
+        ) {
             return 'width';
         } elseif ($thumbnailSize->height) {
             return 'height';
