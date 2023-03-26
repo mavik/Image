@@ -37,11 +37,10 @@ class ThumbnailsMaker
      * @return ImageImmutable[] As indexes are used the scales.
      */
     public function createThumbnails(
-        string $originalSrc,
+        Image $originalImage,
         ImageSize $thumbnailSize,
         array $scales = [1]
     ): array {
-        $originalImage = new ImageImmutable($originalSrc);
         /** @var ImageImmutable[] $thumbnails **/
         $thumbnails = [];
         foreach ($scales as $scale) {
