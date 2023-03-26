@@ -34,17 +34,18 @@ class ThumbnailsMaker
      * Please note, if requested thumbnail has the same or bigger width or height
      * than original image, it won't be created.
      * 
+     * @param ImageImmutable|Image $image Can be object of class ImageImmutable or Image, but ImageImmutable is recommended.
      * @return ImageImmutable[] As indexes are used the scales.
      */
     public function createThumbnails(
-        Image $originalImage,
+        Image $image,
         ImageSize $thumbnailSize,
         array $scales = [1]
     ): array {
         /** @var ImageImmutable[] $thumbnails **/
         $thumbnails = [];
         foreach ($scales as $scale) {
-            $thumbnail = $this->createThumbnailForScale($originalImage, $thumbnailSize, $scale);
+            $thumbnail = $this->createThumbnailForScale($image, $thumbnailSize, $scale);
             if ($thumbnail) {
                 $thumbnails[$scale] = $thumbnail;
             }
@@ -53,24 +54,26 @@ class ThumbnailsMaker
     }
     
     private function createThumbnailForScale(
-        Image $originalImage,
+        Image $image,
         ImageSize $thumbnailSize,
         float $scale
     ): ?ImageImmutable {
-        $originalSize = $originalImage->getSize(); 
+        $originalSize = $image->getSize(); 
         $scaledThumbnailSize = $thumbnailSize->scale($scale);
         if (!$scaledThumbnailSize->lessThan($originalSize)) {
             return null;
         } 
         $originalImageArea = $this->resizeStrategy->originalImageArea($originalSize, $scaledThumbnailSize);
         $realThumbnailSize = $this->resizeStrategy->realThumbnailSize($originalSize, $scaledThumbnailSize);
-        return $originalImage->cropAndResize(
-            $originalImageArea->x,
-            $originalImageArea->y,
-            $originalImageArea->width,
-            $originalImageArea->height,
-            $realThumbnailSize->width,
-            $realThumbnailSize->height
-        );
+        return ($image instanceof ImageImmutable ? $image : clone $image)
+            ->cropAndResize(
+                $originalImageArea->x,
+                $originalImageArea->y,
+                $originalImageArea->width,
+                $originalImageArea->height,
+                $realThumbnailSize->width,
+                $realThumbnailSize->height
+            )
+        ;
     }
 }
