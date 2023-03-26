@@ -28,4 +28,21 @@ class ImageSize
         $this->width = $width;
         $this->height = $height;
     }
+    
+    public function scale(float $scale): self
+    {
+        return new self($this->width * $scale, $this->height * $scale);
+    }
+    
+    public function lessThan(self $size): bool
+    {
+        return
+            $this->width &&
+            $size->width &&
+            $this->height && 
+            $size->height &&
+            $this->width < $size->width &&
+            $this->height < $size->height
+        ;
+    }
 }
