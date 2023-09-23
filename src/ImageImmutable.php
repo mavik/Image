@@ -55,6 +55,7 @@ class ImageImmutable extends Image
     {
         $this->flagCloneResourceWhenCloning = false;
         $newImage = clone $this;
+        $newImage->resetSize();
         $this->flagCloneResourceWhenCloning = true;
         $newImage->resource = $resource;
         return $newImage;
