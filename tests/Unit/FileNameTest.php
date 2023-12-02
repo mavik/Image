@@ -20,8 +20,7 @@ class FileNameTest extends TestCase
      */
     public function testGetPath(array $config, string $src, string $path = null, string $url = null)
     {
-        FileName::configure($config);
-        $fileName = new FileName($src);
+        $fileName = new FileName($src, $config['base_uri'], $config['web_root_dir']);
         $this->assertEquals($path, $fileName->getPath());
     }
     
@@ -31,14 +30,13 @@ class FileNameTest extends TestCase
      */
     public function testGetUrl(array $config, string $src, string $path = null, string $url = null)
     {
-        FileName::configure($config);
-        $fileName = new FileName($src);
+        $fileName = new FileName($src, $config['base_uri'], $config['web_root_dir']);
         $this->assertEquals($url, $fileName->getUrl());
     }
         
     public function files()
     {
-        $webRootDir = __DIR__ . '/../resources';
+        $webRootDir = realpath(__DIR__ . '/../resources') . '/';
         
         /**
          * config
@@ -49,7 +47,7 @@ class FileNameTest extends TestCase
         return [
             [   0 =>
                 [
-                    'base_url' => 'http://test.com/',
+                    'base_uri' => 'http://test.com/',
                     'web_root_dir' => $webRootDir
                 ],
                 'http://test.com/images/apple.jpg',
@@ -57,7 +55,7 @@ class FileNameTest extends TestCase
                 'http://test.com/images/apple.jpg'
             ],[ 1 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 'http://test.com/resources/images/apple.jpg',
@@ -65,7 +63,7 @@ class FileNameTest extends TestCase
                 'http://test.com/resources/images/apple.jpg'
             ],[ 2 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 'http://test2.com/resources/images/apple.jpg',
@@ -73,7 +71,7 @@ class FileNameTest extends TestCase
                 'http://test2.com/resources/images/apple.jpg',
             ],[ 3 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 'http://test.com/site2/images/apple.jpg',
@@ -81,7 +79,7 @@ class FileNameTest extends TestCase
                 'http://test.com/site2/images/apple.jpg'
             ],[ 4 =>
                 [
-                    'base_url' => 'http://test.com/resources/',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 '/resources/images/apple.jpg',
@@ -89,7 +87,7 @@ class FileNameTest extends TestCase
                 'http://test.com/resources/images/apple.jpg'
             ],[ 5 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 'images/apple.jpg',
@@ -97,7 +95,7 @@ class FileNameTest extends TestCase
                 'http://test.com/resources/images/apple.jpg'
             ],[ 6 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 realpath(__DIR__ . '/../resources/images/apple.jpg'),
@@ -105,7 +103,7 @@ class FileNameTest extends TestCase
                 'http://test.com/resources/images/apple.jpg'
             ],[ 7 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 __DIR__ . '/../resources/images/apple.jpg',
@@ -113,7 +111,7 @@ class FileNameTest extends TestCase
                 'http://test.com/resources/images/apple.jpg'
             ],[ 8 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 'resources/images/beach.webp',
@@ -121,7 +119,7 @@ class FileNameTest extends TestCase
                 'http://test.com/resources/images/beach.webp'
             ],[ 9 =>
                 [
-                    'base_url' => 'http://test.com/resources',
+                    'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
                 '/src/../resources/images/beach.webp',

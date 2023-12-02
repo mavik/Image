@@ -24,10 +24,10 @@ class ImageTest extends TestCase
     {
         HttpServer::start();
         
-        Image::configure([
-            'base_url' => 'http://test.com/',
-            'web_root_dir' => __DIR__ . '/../resources'
-        ]);
+        Image::configure(new Configuration(
+            'http://test.com/',
+            __DIR__ . '/../resources'
+        ));
     }
 
     /**

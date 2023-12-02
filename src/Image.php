@@ -10,22 +10,7 @@
 namespace Mavik\Image;
 
 class Image
-{
-    const DEFAULT_CONFIGURATION = [
-        'graphic_library' => [
-            'priority' => [
-                'gmagick',
-                'imagick',
-                'gd2',
-            ]
-        ],
-        'base_url' => '',
-        'web_root_dir' => '',
-    ];
-    
-    /** @var array */
-    protected static $configuration = [];
-    
+{    
     /** @var mix */
     protected $resource;
     
@@ -38,25 +23,23 @@ class Image
     /** @var ImageFile */
     protected $file;
     
+    /** @var Configuration */
+    protected static $configuration;
+
     /** @var GraphicLibraryInterface */
-    protected $graphicLibrary;
+    protected static $graphicLibrary;
     
-    public static function configure(array $configuration): void
+    public static function configure(Configuration $configuration): void
     {
-        self::$configuration = array_merge(
-            self::DEFAULT_CONFIGURATION,
-            self::$configuration,
-            $configuration
-        );
-        
-        FileName::configure([
-            'base_url' => $configuration['base_url'],
-            'web_root_dir' => $configuration['web_root_dir'],
-        ]);
+        static::$configuration = $configuration;
+        $graphicLibraryClass = self::$configuration->graphicLibraryClass();
+        static::$graphicLibrary = new $graphicLibraryClass;
     }
 
     private function __construct() {
-        $this->initGraphicLibrary();
+        if (empty(static::$configuration)) {
+            throw new LogicException('Method ' . static::class . ':configure must be called before creating instances.');
+        }
     }
     
     /**
@@ -66,7 +49,7 @@ class Image
      */
     public static function create(string $src): self
     {
-        $fileName = new FileName($src);
+        $fileName = new FileName($src, static::$configuration->baseUri(), static::$configuration->webRootDirectory());
         $imageFile = new ImageFile($fileName);
         $image = new static();
         $image->file = $imageFile;
@@ -79,7 +62,7 @@ class Image
     public static function createFromString(string $content): self
     {
         $image = new static();
-        $image->resource = $image->graphicLibrary->loadFromString($content);
+        $image->resource = static::$graphicLibrary->loadFromString($content);
         $info = getimagesizefromstring($content);
         $image->type = $info[2];
         return $image;
@@ -87,7 +70,7 @@ class Image
 
     public function save(string $path): Image
     {
-        $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
+        static::$graphicLibrary->save($this->getResource(), $path, $this->getType());
         return $this;
     }    
 
@@ -146,8 +129,8 @@ class Image
     private function getImageSizeFromResource(): ImageSize
     {
         return new ImageSize(
-            $this->graphicLibrary->getWidth($this->resource),
-            $this->graphicLibrary->getHeight($this->resource)
+            static::$graphicLibrary->getWidth($this->resource),
+            static::$graphicLibrary->getHeight($this->resource)
         );
     }
     
@@ -158,14 +141,14 @@ class Image
     
     public function resize(int $width, int $height): Image
     {
-        $this->resource = $this->graphicLibrary->resize($this->getResource(), $width, $height);
+        $this->resource = static::$graphicLibrary->resize($this->getResource(), $width, $height);
         $this->resetSize();
         return $this;
     }
 
     public function crop(int $x, int $y, int $width, int $height): Image
     {
-        $this->resource = $this->graphicLibrary->crop($this->getResource(), $x, $y, $width, $height);
+        $this->resource = static::$graphicLibrary->crop($this->getResource(), $x, $y, $width, $height);
         $this->resetSize();
         return $this;
     }
@@ -178,23 +161,9 @@ class Image
         int $toWidth,
         int $toHeight
     ) {
-        $this->resource = $this->graphicLibrary->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
+        $this->resource = static::$graphicLibrary->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
         $this->resetSize();
         return $this;
-    }
-
-    protected function initGraphicLibrary(): void
-    {
-        foreach (self::$configuration['graphic_library']['priority'] as $libraryName) {
-            $className = 'Mavik\\Image\\GraphicLibrary\\' . ucfirst(strtolower($libraryName));
-            if (class_exists($className, true) && $className::isInstalled()) {
-                $this->graphicLibrary = new $className(self::$configuration['graphic_library']);
-                break;
-            }
-        }
-        if (!isset($this->graphicLibrary)) {
-            throw new Exception\ConfigurationException('Configuration error: None of the required graphics libraries are installed.');
-        }
     }
     
     /**
@@ -203,7 +172,7 @@ class Image
     protected function getResource()
     {
         if (!isset($this->resource)) {
-            $this->resource = $this->graphicLibrary->load($this->file);
+            $this->resource = static::$graphicLibrary->load($this->file);
         }
         return $this->resource;
     }
@@ -221,11 +190,11 @@ class Image
         if (isset($this->file)) {
             $this->file = clone $this->file;
         }
-        if (isset($this->graphicLibrary)) {
-            $this->graphicLibrary = clone $this->graphicLibrary;
+        if (isset(static::$graphicLibrary)) {
+            static::$graphicLibrary = clone static::$graphicLibrary;
         }
         if (isset($this->resource)) {
-            $this->resource = $this->graphicLibrary->clone($this->resource);
+            $this->resource = static::$graphicLibrary->clone($this->resource);
         }
     }
 }
