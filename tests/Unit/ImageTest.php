@@ -19,15 +19,16 @@ ini_set('user_agent', "UnitTest Bot");
 
 class ImageTest extends TestCase
 {
+    /** @var Configuration */
+    private static $configuration;
 
     public static function setUpBeforeClass(): void
     {
-        HttpServer::start();
-        
-        Image::configure(new Configuration(
+        HttpServer::start();        
+        self::$configuration = new Configuration(
             'http://test.com/',
             __DIR__ . '/../resources'
-        ));
+        );
     }
 
     /**
@@ -36,7 +37,7 @@ class ImageTest extends TestCase
      */
     public function testGetType(string $src, array $info)
     {
-        $image = Image::create($src);
+        $image = Image::create($src, self::$configuration);
         $this->assertEquals($info['type'], $image->getType());
     }
 
@@ -49,7 +50,7 @@ class ImageTest extends TestCase
      */
     public function testGetSize(string $src, array $info)
     {
-        $image = Image::create($src);
+        $image = Image::create($src, self::$configuration);
         $this->assertEquals($info['width'], $image->getSize()->width);
         $this->assertEquals($info['height'], $image->getSize()->height);
         $this->assertEquals($info['width'], $image->getWidth());
@@ -62,7 +63,7 @@ class ImageTest extends TestCase
      */
     public function testGetFileSize(string $src, array $info)
     {
-        $image = Image::create($src);
+        $image = Image::create($src, self::$configuration);
         $this->assertEquals($info['file_size'], $image->getFileSize());
     }
     
@@ -73,7 +74,7 @@ class ImageTest extends TestCase
     public function testSave(string $origFile)
     {    
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
-        $image = Image::create($origFile);
+        $image = Image::create($origFile, self::$configuration);
         $image->save($savedFile);                        
         $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
         unlink($savedFile);
@@ -87,7 +88,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
 
-        $image = Image::create($origFile);        
+        $image = Image::create($origFile, self::$configuration);
         $image->crop(25, 40, 400, 500);        
         $newImage = clone $image;
         $image->crop(50, 50, 50, 50);
@@ -102,7 +103,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = Image::createFromString(file_get_contents($origFile));
+        $image = Image::createFromString(file_get_contents($origFile), self::$configuration);
         $image->save($savedFile);
         $this->assertLessThan(1, CompareImages::distance($origFile, $savedFile));
         unlink($savedFile);
@@ -116,7 +117,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = Image::create($origFile);
+        $image = Image::create($origFile, self::$configuration);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
         $image->crop(25, 40, 400, 500)->save($savedFile);
@@ -136,7 +137,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
         
-        $image = Image::create($origFile);
+        $image = Image::create($origFile, self::$configuration);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
         $image->resize(400, 500)->save($savedFile);
@@ -156,7 +157,7 @@ class ImageTest extends TestCase
         $origFile = __DIR__ . '/../resources/images/apple.jpg';
         $savedFile = __DIR__ . '/../temp/' . basename($origFile);
                 
-        $image = Image::create($origFile);
+        $image = Image::create($origFile, self::$configuration);
         $this->assertEquals(1200, $image->getWidth());
         $this->assertEquals(1200, $image->getHeight());
         $image->cropAndResize(25, 40, 400, 500, 200, 200)->save($savedFile);

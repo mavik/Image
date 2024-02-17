@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
  *  PHP Library for Image processing and creating thumbnails
  *  
@@ -16,14 +18,14 @@ class ImageImmutable extends Image
 {
     private $flagCloneResourceWhenCloning = true;
 
-    public static function create(string $src): self
+    public static function create(string $src, Configuration $configuration): self
     {
-        return parent::create($src);
+        return parent::create($src, $configuration);
     }
 
-    public static function createFromString(string $content): self
+    public static function createFromString(string $content, Configuration $configuration): self
     {
-        return parent::createFromString($content);
+        return parent::createFromString($content, $configuration);
     }
 
     public function resize(int $width, int $height): self

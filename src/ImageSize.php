@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
  *  PHP Library for Image processing and creating thumbnails
  *  
@@ -31,7 +33,10 @@ class ImageSize
     
     public function scale(float $scale): self
     {
-        return new self($this->width * $scale, $this->height * $scale);
+        return new self(
+            max((int)round($this->width * $scale), 1),
+            max((int)round($this->height * $scale), 1)
+        );
     }
     
     public function lessThan(self $size): bool

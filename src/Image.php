@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * PHP Library for Image processing and creating thumbnails
  *
@@ -24,22 +26,16 @@ class Image
     protected $file;
     
     /** @var Configuration */
-    protected static $configuration;
+    protected $configuration;
 
     /** @var GraphicLibraryInterface */
-    protected static $graphicLibrary;
+    protected $graphicLibrary;
     
-    public static function configure(Configuration $configuration): void
-    {
-        static::$configuration = $configuration;
-        $graphicLibraryClass = self::$configuration->graphicLibraryClass();
-        static::$graphicLibrary = new $graphicLibraryClass;
-    }
-
-    private function __construct() {
-        if (empty(static::$configuration)) {
-            throw new LogicException('Method ' . static::class . ':configure must be called before creating instances.');
-        }
+    private function __construct(
+        Configuration $configuration
+    ) {
+        $this->graphicLibrary = $configuration->graphicLibrary();
+        $this->configuration = $configuration;
     }
     
     /**
@@ -47,11 +43,11 @@ class Image
      * 
      * @param string $src Path or URL
      */
-    public static function create(string $src): self
+    public static function create(string $src, Configuration $configuration): self
     {
-        $fileName = new FileName($src, static::$configuration->baseUri(), static::$configuration->webRootDirectory());
+        $fileName = new FileName($src, $configuration->baseUri(), $configuration->webRootDirectory());
         $imageFile = new ImageFile($fileName);
-        $image = new static();
+        $image = new static($configuration);
         $image->file = $imageFile;
         return $image;
     }
@@ -59,10 +55,10 @@ class Image
     /**
      * Create an instance from the string
      */
-    public static function createFromString(string $content): self
+    public static function createFromString(string $content, Configuration $configuration): self
     {
-        $image = new static();
-        $image->resource = static::$graphicLibrary->loadFromString($content);
+        $image = new static($configuration);
+        $image->resource = $configuration->graphicLibrary()->loadFromString($content);
         $info = getimagesizefromstring($content);
         $image->type = $info[2];
         return $image;
@@ -70,7 +66,7 @@ class Image
 
     public function save(string $path): Image
     {
-        static::$graphicLibrary->save($this->getResource(), $path, $this->getType());
+        $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
         return $this;
     }    
 
@@ -129,8 +125,8 @@ class Image
     private function getImageSizeFromResource(): ImageSize
     {
         return new ImageSize(
-            static::$graphicLibrary->getWidth($this->resource),
-            static::$graphicLibrary->getHeight($this->resource)
+            $this->graphicLibrary->getWidth($this->resource),
+            $this->graphicLibrary->getHeight($this->resource)
         );
     }
     
@@ -141,14 +137,14 @@ class Image
     
     public function resize(int $width, int $height): Image
     {
-        $this->resource = static::$graphicLibrary->resize($this->getResource(), $width, $height);
+        $this->resource = $this->graphicLibrary->resize($this->getResource(), $width, $height);
         $this->resetSize();
         return $this;
     }
 
     public function crop(int $x, int $y, int $width, int $height): Image
     {
-        $this->resource = static::$graphicLibrary->crop($this->getResource(), $x, $y, $width, $height);
+        $this->resource = $this->graphicLibrary->crop($this->getResource(), $x, $y, $width, $height);
         $this->resetSize();
         return $this;
     }
@@ -161,7 +157,7 @@ class Image
         int $toWidth,
         int $toHeight
     ) {
-        $this->resource = static::$graphicLibrary->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
+        $this->resource = $this->graphicLibrary->cropAndResize($this->getResource(), $x, $y, $width, $height, $toWidth, $toHeight);
         $this->resetSize();
         return $this;
     }
@@ -172,7 +168,7 @@ class Image
     protected function getResource()
     {
         if (!isset($this->resource)) {
-            $this->resource = static::$graphicLibrary->load($this->file);
+            $this->resource = $this->graphicLibrary->load($this->file);
         }
         return $this->resource;
     }
@@ -190,11 +186,11 @@ class Image
         if (isset($this->file)) {
             $this->file = clone $this->file;
         }
-        if (isset(static::$graphicLibrary)) {
-            static::$graphicLibrary = clone static::$graphicLibrary;
+        if (isset($this->graphicLibrary)) {
+            $this->graphicLibrary = clone $this->graphicLibrary;
         }
         if (isset($this->resource)) {
-            $this->resource = static::$graphicLibrary->clone($this->resource);
+            $this->resource = $this->graphicLibrary->clone($this->resource);
         }
     }
 }

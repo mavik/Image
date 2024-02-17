@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
  *  PHP Library for Image processing and creating thumbnails
  *  
@@ -17,8 +19,8 @@ class Configuration
     /** @var string */
     private $webRootDirectory;
     
-    /** @var string */
-    private $graphicLibraryClass;
+    /** @var GraphicLibraryInterface */
+    private $graphicLibrary;
 
     public function __construct(
         string $baseUri,
@@ -27,7 +29,7 @@ class Configuration
     ) {
         $this->setBaseUri($baseUri);
         $this->setWebRootDirectory($webRootDirectory);
-        $this->setGraphicLibraryClass($graphicLibraryPriority);
+        $this->initGraphicLibrary($graphicLibraryPriority);
     }
     
     public function baseUri(): string
@@ -40,9 +42,9 @@ class Configuration
         return $this->webRootDirectory;
     }
 
-    public function graphicLibraryClass(): string
+    public function graphicLibrary(): GraphicLibraryInterface
     {
-        return $this->graphicLibraryClass;
+        return $this->graphicLibrary;
     }
     
     private function setBaseUri(string $baseUri): void
@@ -72,17 +74,18 @@ class Configuration
     /**
      * @param string[] $graphicLibraryPriority
      */
-    private function setGraphicLibraryClass(array $graphicLibraryPriority)
+    private function initGraphicLibrary(array $graphicLibraryPriority)
     {
         foreach ($graphicLibraryPriority as $graphicLibrary) {
             $className = 'Mavik\\Image\\GraphicLibrary\\' . ucfirst(strtolower($graphicLibrary));
             if (class_exists($className, true) && $className::isInstalled()) {
-                $this->graphicLibraryClass = $className;
+                $graphicLibraryClass = $className;
                 break;
             }
         }
-        if (!isset($this->graphicLibraryClass)) {
+        if (!isset($graphicLibraryClass)) {
             throw new Exception\ConfigurationException('Configuration error: None of the required graphics libraries are installed.');
-        }        
+        }
+        $this->graphicLibrary = new $graphicLibraryClass;
     }
 }
