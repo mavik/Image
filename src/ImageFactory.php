@@ -11,6 +11,9 @@ declare(strict_types=1);
  */
 namespace Mavik\Image;
 
+/**
+ * Facade of the library
+ */
 class ImageFactory
 {
     /** @var Configuration */
@@ -40,4 +43,34 @@ class ImageFactory
     {
         return ImageImmutable::createFromString($src, $this->configuration);
     }
+    
+    public function createImageWithThumbnails(
+        string $src,
+        ImageSize $thumbnailSize = null,
+        string $resizeType = 'stretch',
+        array $thumbnailScails = [1]
+    ): ImageWithThumbnails {
+        return ImageWithThumbnails::create(
+            $src,
+            $this->configuration,
+            $thumbnailSize,
+            $resizeType,
+            $thumbnailScails
+        );
+    }
+    
+    public function createImageWithThumbnailsFromString(
+        string $content,
+        ImageSize $thumbnailSize = null,
+        string $resizeType = 'stretch',
+        array $thumbnailScails = [1]
+    ): ImageWithThumbnails {
+        return ImageWithThumbnails::createFromString(
+            $content,
+            $this->configuration,
+            $thumbnailSize,
+            $resizeType,
+            $thumbnailScails
+        );
+    }    
 }

@@ -21,11 +21,12 @@ class ImageWithThumbnails extends ImageImmutable
 
     public static function create(
         string $src,
+        Configuration $configuration,
         ImageSize $thumbnailSize = null,
         string $resizeType = 'stretch',
         array $thumbnailScails = [1]
     ): self {
-        $image = parent::create($src);
+        $image = parent::create($src, $configuration);
         if ($thumbnailSize) {
             self::addThumbnails($image, $thumbnailSize, $resizeType, $thumbnailScails);
         }
@@ -34,11 +35,12 @@ class ImageWithThumbnails extends ImageImmutable
 
     public static function createFromString(
         string $content,
+        Configuration $configuration,
         ImageSize $thumbnailSize = null,
         string $resizeType = 'stretch',
         array $thumbnailScails = [1]
     ): self {
-        $image = parent::createFromString($content);
+        $image = parent::createFromString($content, $configuration);
         if ($thumbnailSize) {
             self::addThumbnails($image, $thumbnailSize, $resizeType, $thumbnailScails);
         }
