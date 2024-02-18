@@ -46,14 +46,15 @@ class ImageFactory
     
     public function createImageWithThumbnails(
         string $src,
-        ImageSize $thumbnailSize = null,
+        int $width = null,
+        int $height = null,
         string $resizeType = 'stretch',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::create(
             $src,
             $this->configuration,
-            $thumbnailSize,
+            new ImageSize($width, $height),
             $resizeType,
             $thumbnailScails
         );
@@ -61,14 +62,15 @@ class ImageFactory
     
     public function createImageWithThumbnailsFromString(
         string $content,
-        ImageSize $thumbnailSize = null,
+        int $width = null,
+        int $height = null,
         string $resizeType = 'stretch',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::createFromString(
             $content,
             $this->configuration,
-            $thumbnailSize,
+            new ImageSize($width, $height),
             $resizeType,
             $thumbnailScails
         );
