@@ -11,16 +11,23 @@
 namespace Mavik\Image;
 
 use PHPUnit\Framework\TestCase;
+use Mavik\Image\ImageFactory;
 use Mavik\Image\Tests\CompareImages;
+use Mavik\Image\Configuration;
 
 class ImageWithThumbnailsTest extends TestCase
 {
+    /** @var ImageFactory */
+    private static $imageFactory;
+
     public static function setUpBeforeClass(): void
     {   
-        ImageWithThumbnails::configure([
-            'base_url' => 'http://test.com/',
-            'web_root_dir' => __DIR__ . '/../resources'
-        ]);
+        self::$imageFactory = new ImageFactory(
+            new Configuration(
+                'http://test.com/',
+                __DIR__ . '/../resources'
+            )
+        );
     }    
     
     public function testCreate()
@@ -30,9 +37,10 @@ class ImageWithThumbnailsTest extends TestCase
         $thumb2 = __DIR__ . '/../temp/apple-2-fit.jpg';
         $thumb1Sample = __DIR__ . '/../resources/images/resized/apple-100-200-fill.jpg';
         $thumb2Sample = __DIR__ . '/../resources/images/resized/apple-200-400-fill.jpg';
-        $image = ImageWithThumbnails::create(
+        $image = self::$imageFactory->createImageWithThumbnails(
             $origFile,
-            new ImageSize(100, 200),
+            100,
+            200,
             'fill',
             [1,2]
         );

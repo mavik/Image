@@ -31,8 +31,8 @@ class Fill implements ResizeStrategyInterface
         } else {
                 $y = 0;
                 $height = $originalSize->height;
-                $widht = round($thumbnailSize->width * $height/$thumbnailSize->height);
-                $x = round(($originalSize->width - $widht)/2);
+                $widht = (int)round($thumbnailSize->width * $height/$thumbnailSize->height);
+                $x = (int)round(($originalSize->width - $widht)/2);
         }
         return new ImageArea($x, $y, $widht, $height);
     }
