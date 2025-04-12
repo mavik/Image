@@ -32,7 +32,7 @@ class Gd2 implements GraphicLibraryInterface
     {
         $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
         if (PHP_VERSION_ID >= 80000) {
-            $this->typesMap = new SplObjectStorage();
+            $this->typesMap = new \SplObjectStorage();
         } else {
             $this->typesMap = [];
         }
