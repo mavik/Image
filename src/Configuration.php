@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace Mavik\Image;
 
+use Mavik\Image\Exception\FileException;
+
 class Configuration
 {
     /** @var string */
@@ -63,7 +65,7 @@ class Configuration
     {
         $path = realpath($webRootDirectory);
         if ($path === false) {
-            throw new InvalidArgumentException("Directory '{webRootDirectory}' does not exist.");
+            throw new \InvalidArgumentException("Directory '{webRootDirectory}' does not exist.");
         }
         if (substr($path, -1) !== '/') {
             $path .= '/';
