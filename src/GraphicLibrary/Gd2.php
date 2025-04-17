@@ -98,7 +98,7 @@ class Gd2 implements GraphicLibraryInterface
             default:
                 throw new GraphicLibraryException('Trying to open unsupported type of image ' . image_type_to_mime_type($type));
         }        
-        if (!is_resource($image)) {
+        if (!is_resource($image) && !($image instanceof \GDImage)) {
             throw new GraphicLibraryException("Cannot open image \"{$src}\"");
         }
         $this->mapType($image, $type);
