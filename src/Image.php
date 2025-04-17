@@ -64,9 +64,12 @@ class Image
         return $image;
     }
 
-    public function save(string $path): Image
+    public function save(string $path, bool $isNewSrc = false): Image
     {
         $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
+        if ($isNewSrc) {
+            $this->file = new FileName($path, $this->configuration->baseUri(), $this->configuration->webRootDirectory());
+        }
         return $this;
     }    
 
@@ -100,7 +103,7 @@ class Image
             } elseif (isset($this->file)) {
                 $this->size = $this->file->getImageSize();
             } else {
-                throw new LogicException();
+                throw new \LogicException();
             }
         }
         return $this->size;
