@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -47,7 +48,7 @@ class ThumbnailsMaker
         array $scales = [1],
     ): array {
         $thumbnails = [];
-        foreach ($scales as $scale) {            
+        foreach ($scales as $scale) {
             $thumbnail = $this->thumbnailForScale($image, $thumbnailSize, $resizeStrategy, $scale);
             if ($thumbnail) {
                 $thumbnails[$scale] = $thumbnail;
@@ -61,9 +62,9 @@ class ThumbnailsMaker
         ImageSize $thumbnailSize,
         ResizeStrategyInterface $resizeStrategy,
         float $scale
-    ) : ?ImageImmutable {
+    ): ?ImageImmutable {
         $thumbnailPath = $this->thumbnailPath(
-            $image->getPath(),
+            $image,
             $thumbnailSize->width,
             $thumbnailSize->height,
             $resizeStrategy->name(),
@@ -80,7 +81,7 @@ class ThumbnailsMaker
             $scale
         );
     }
-    
+
     private function createThumbnailForScale(
         Image $image,
         ImageSize $thumbnailSize,
@@ -88,11 +89,11 @@ class ThumbnailsMaker
         string $filePath,
         float $scale
     ): ?ImageImmutable {
-        $originalSize = $image->getSize(); 
+        $originalSize = $image->getSize();
         $scaledThumbnailSize = $thumbnailSize->scale($scale);
         if (!$scaledThumbnailSize->lessThan($originalSize)) {
             return null;
-        } 
+        }
         $originalImageArea = $resizeStrategy->originalImageArea($originalSize, $scaledThumbnailSize);
         $realThumbnailSize = $resizeStrategy->realThumbnailSize($originalSize, $scaledThumbnailSize);
         $thumbnail = ($image instanceof ImageImmutable ? $image : clone $image)
@@ -103,27 +104,31 @@ class ThumbnailsMaker
                 $originalImageArea->height,
                 $realThumbnailSize->width,
                 $realThumbnailSize->height
-            )
-        ;
+            );
         $thumbnail->save($filePath);
         return $thumbnail;
     }
 
     private function thumbnailPath(
-        string $imagePath,
+        Image $image,
         int $width,
         int $height,
         string $resizeStrategyName,
         float $scale
     ): string {
+        $imagePath = $image->getPath();
+        if ($imagePath && strpos($imagePath, $this->configuration->webRootDirectory()) === 0) {
+            $imagePath = substr($imagePath, strlen($this->configuration->webRootDirectory()));
+        } else {
+            $imagePath = preg_replace('/^\w+\:\/\//', '', $imagePath);;
+        }
         $lastDotPosition = strrpos($imagePath, '.') ?: strlen($imagePath);
         return
             $this->configuration->thumbnailsDirectory()
             . substr($imagePath, 0, $lastDotPosition)
             . '-' . $resizeStrategyName
             . '-' . $width . 'x' . $height
-            . '@' . str_replace([',', '.'], '-', (string)$scale) 
-            . '.' . substr($imagePath, $lastDotPosition + 1)
-        ;
+            . '@' . str_replace([',', '.'], '-', (string)$scale)
+            . '.' . substr($imagePath, $lastDotPosition + 1);
     }
- }
+}
