@@ -66,6 +66,12 @@ class Image
 
     public function save(string $path): static
     {
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            if (!mkdir($dir, 0755, true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
+            }
+        }
         $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
         $this->file = new FileName($path, $this->configuration->baseUri(), $this->configuration->webRootDirectory());
         return $this;
