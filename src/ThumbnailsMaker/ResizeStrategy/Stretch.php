@@ -17,6 +17,11 @@ use Mavik\Image\ThumbnailsMaker\ImageArea;
 
 class Stretch implements ResizeStrategyInterface
 {
+    public function name(): string
+    {
+        return 'stretch';
+    }
+
     public function originalImageArea(ImageSize $originalSize, ImageSize $thumbnailSize): ImageArea
     {
         return new ImageArea(0, 0, $originalSize->width, $originalSize->height);

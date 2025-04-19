@@ -18,6 +18,11 @@ use Mavik\Image\Exception;
 
 class Fill implements ResizeStrategyInterface
 {
+    public function name(): string
+    {
+        return 'fill';
+    }
+
     public function originalImageArea(ImageSize $originalSize, ImageSize $thumbnailSize): ImageArea
     {
         if (empty($thumbnailSize->width) || empty($thumbnailSize->height)) {
@@ -44,11 +49,11 @@ class Fill implements ResizeStrategyInterface
         } elseif ($thumbnailSize->width) {
             return new ImageSize(
                 $thumbnailSize->width,
-                round($originalSize->height * $thumbnailSize->width / $originalSize->width)
+                (int)round($originalSize->height * $thumbnailSize->width / $originalSize->width)
             );
         } elseif ($thumbnailSize->height) {
             return new ImageSize(
-                round($originalSize->width * $thumbnailSize->height / $originalSize->height),
+                (int)round($originalSize->width * $thumbnailSize->height / $originalSize->height),
                 $thumbnailSize->height
             );
         }

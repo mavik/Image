@@ -17,6 +17,11 @@ use Mavik\Image\ThumbnailsMaker\ImageArea;
 
 class Fit implements ResizeStrategyInterface
 {
+    public function name(): string
+    {
+        return 'fit';
+    }
+
     public function originalImageArea(ImageSize $originalSize, ImageSize $thumbnailSize): ImageArea
     {
         return new ImageArea(0, 0, $originalSize->width, $originalSize->height);
@@ -27,11 +32,11 @@ class Fit implements ResizeStrategyInterface
         if ($this->usingDimension($originalSize, $thumbnailSize) == 'width') {
             return new ImageSize(
                 $thumbnailSize->width,
-                round($originalSize->height * $thumbnailSize->width / $originalSize->width)
+                (int)round($originalSize->height * $thumbnailSize->width / $originalSize->width)
             );
         } else {
             return new ImageSize(
-            round($originalSize->width * $thumbnailSize->height / $originalSize->height),
+            (int)round($originalSize->width * $thumbnailSize->height / $originalSize->height),
                 $thumbnailSize->height
             );            
         }
@@ -54,6 +59,6 @@ class Fit implements ResizeStrategyInterface
         } elseif ($thumbnailSize->height) {
             return 'height';
         }
-        throw new Exception('Cannot select dimension in ResizeStrategy\Fit::usingDimension');
+        throw new \Exception('Cannot select dimension in ResizeStrategy\Fit::usingDimension');
     }
 }
