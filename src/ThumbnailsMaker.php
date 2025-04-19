@@ -69,7 +69,7 @@ class ThumbnailsMaker
             $resizeStrategy->name(),
             $scale
         );
-        if (file_exists($thumbnailPath)) {
+        if (file_exists($thumbnailPath) && filemtime($thumbnailPath) >= filemtime($image->getPath())) {
             return ImageImmutable::create($thumbnailPath, $this->configuration);
         }
         return $this->createThumbnailForScale(
