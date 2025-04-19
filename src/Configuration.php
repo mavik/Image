@@ -91,9 +91,13 @@ class Configuration
 
     private function setThumbnailsDirectory(string $webRoorDirecory, string $thumbnailsDirectory): void
     {
-        $path = realpath($webRoorDirecory . $thumbnailsDirectory);
+        $thumbnailsFullPath =  $webRoorDirecory . '/' . $thumbnailsDirectory;
+        if (!file_exists($thumbnailsFullPath)) {
+            mkdir($thumbnailsFullPath, 0755, true);
+        }        
+        $path = realpath($thumbnailsFullPath);
         if ($path === false) {
-            throw new \InvalidArgumentException("Directory '{thumbnailsDirectory}' does not exist.");
+            throw new \InvalidArgumentException("Directory '{$thumbnailsFullPath}' does not exist.");
         }
         if (substr($path, -1) !== '/') {
             $path .= '/';

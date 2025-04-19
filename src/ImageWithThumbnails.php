@@ -33,11 +33,10 @@ class ImageWithThumbnails extends ImageImmutable
     ): static {
         $image = parent::create($src, $configuration);
         if ($thumbnailSize && $resizeStrategy && $thumbnailsMaker) {
-            $image->thumbnails = $thumbnailsMaker->createThumbnails(
+            $image->thumbnails = $thumbnailsMaker->thumbnails(
                 $image,
                 $thumbnailSize,
                 $resizeStrategy,
-                $thumbnailsDir,
                 $thumbnailScails
             );
         }
@@ -55,11 +54,10 @@ class ImageWithThumbnails extends ImageImmutable
     ): static {
         $image = parent::createFromString($content, $configuration);
         if ($thumbnailSize) {
-            $image->thumbnails = $thumbnailsMaker->createThumbnails(
+            $image->thumbnails = $thumbnailsMaker->thumbnails(
                 $image,
                 $thumbnailSize,
                 $resizeStrategy,
-                $thumbnailsDir,
                 $thumbnailScails
             );
         }
