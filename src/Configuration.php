@@ -20,17 +20,28 @@ class Configuration
     
     /** @var string */
     private $webRootDirectory;
+
+    /** @var string */
+    private $thumbnailsDirectory;
     
     /** @var GraphicLibraryInterface */
     private $graphicLibrary;
 
+    /**
+     * @param string $baseUri
+     * @param string $webRootDirectory Absolute path to the web root directory.
+     * @param string $thumbnailsDirectory Relative path to the thumbnails directory.
+     * @param string[] $graphicLibraryPriority
+     */
     public function __construct(
         string $baseUri,
         string $webRootDirectory,
+        string $thumbnailsDirectory,
         array $graphicLibraryPriority = ['gmagick', 'imagick', 'gd2']
     ) {
         $this->setBaseUri($baseUri);
         $this->setWebRootDirectory($webRootDirectory);
+        $this->setThumbnailsDirectory($webRootDirectory, $thumbnailsDirectory);
         $this->initGraphicLibrary($graphicLibraryPriority);
     }
     
@@ -42,6 +53,11 @@ class Configuration
     public function webRootDirectory(): string
     {
         return $this->webRootDirectory;
+    }
+
+    public function thumbnailsDirectory(): string
+    {
+        return $this->thumbnailsDirectory;
     }
 
     public function graphicLibrary(): GraphicLibraryInterface
@@ -63,7 +79,7 @@ class Configuration
 
     private function setWebRootDirectory(string $webRootDirectory): void
     {
-        $path = realpath($webRootDirectory);
+        $path = realpath( $webRootDirectory);
         if ($path === false) {
             throw new \InvalidArgumentException("Directory '{webRootDirectory}' does not exist.");
         }
@@ -71,6 +87,18 @@ class Configuration
             $path .= '/';
         }
         $this->webRootDirectory = $path;
+    }
+
+    private function setThumbnailsDirectory(string $webRoorDirecory, string $thumbnailsDirectory): void
+    {
+        $path = realpath($webRoorDirecory . $thumbnailsDirectory);
+        if ($path === false) {
+            throw new \InvalidArgumentException("Directory '{thumbnailsDirectory}' does not exist.");
+        }
+        if (substr($path, -1) !== '/') {
+            $path .= '/';
+        }
+        $this->thumbnailsDirectory = $path;
     }
 
     /**

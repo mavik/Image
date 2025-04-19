@@ -9,6 +9,7 @@ declare(strict_types=1);
  *  @copyright 2022 Vitalii Marenkov
  *  @license MIT; see LICENSE
  */
+
 namespace Mavik\Image;
 
 use Mavik\Image\ThumbnailsMaker\ResizeStrategyInterface;
@@ -18,8 +19,16 @@ use Mavik\Image\ThumbnailsMaker\ResizeStrategyInterface;
  */
 class ThumbnailsMaker
 {
+    private Configuration $configuration;
+
+    public function __construct(
+        Configuration $configuration,
+    ) {
+        $this->configuration = $configuration;
+    }
+
     /**
-     * Create thumbnails from $originalSrc
+     * Thumbnails for $originalSrc
      * 
      * You can create a few thumbnails in different scales from one image using parameter "scales".
      * For example, if scales = [1,2], it will be created 2 thumbnails,
@@ -31,29 +40,52 @@ class ThumbnailsMaker
      * @param ImageImmutable|Image $image Can be object of class ImageImmutable or Image, but ImageImmutable is recommended.
      * @return ImageImmutable[] As indexes are used the scales.
      */
-    public function createThumbnails(
+    public function thumbnails(
         Image $image,
         ImageSize $thumbnailSize,
         ResizeStrategyInterface $resizeStrategy,
-        string $thumbnailsDir,
         array $scales = [1],
     ): array {
-        /** @var ImageImmutable[] $thumbnails **/
         $thumbnails = [];
-        foreach ($scales as $scale) {
-            $thumbnail = $this->createThumbnailForScale($image, $thumbnailSize, $resizeStrategy, $thumbnailsDir, $scale);
+        foreach ($scales as $scale) {            
+            $thumbnail = $this->thumbnailForScale($image, $thumbnailSize, $resizeStrategy, $scale);
             if ($thumbnail) {
                 $thumbnails[$scale] = $thumbnail;
             }
         }
         return $thumbnails;
     }
+
+    private function thumbnailForScale(
+        Image $image,
+        ImageSize $thumbnailSize,
+        ResizeStrategyInterface $resizeStrategy,
+        float $scale
+    ) : ?ImageImmutable {
+        $thumbnailPath = $this->thumbnailPath(
+            $image->getPath(),
+            $thumbnailSize->width,
+            $thumbnailSize->height,
+            $resizeStrategy->name(),
+            $scale
+        );
+        if (file_exists($thumbnailPath)) {
+            return ImageImmutable::create($thumbnailPath, $this->configuration);
+        }
+        return $this->createThumbnailForScale(
+            $image,
+            $thumbnailSize,
+            $resizeStrategy,
+            $thumbnailPath,
+            $scale
+        );
+    }
     
     private function createThumbnailForScale(
         Image $image,
         ImageSize $thumbnailSize,
         ResizeStrategyInterface $resizeStrategy,
-        string $thumbnailsDir,
+        string $filePath,
         float $scale
     ): ?ImageImmutable {
         $originalSize = $image->getSize(); 
@@ -73,19 +105,25 @@ class ThumbnailsMaker
                 $realThumbnailSize->height
             )
         ;
-        $this->saveThumbnail($thumbnail, $thumbnailsDir);
+        $thumbnail->save($filePath);
         return $thumbnail;
     }
 
-    private function saveThumbnail(Image $thubnail, string $thumbnailsDir): void
-    {
-        $lastDotPosition = strrpos($thubnail->getPath(), '.') ?: strlen($thubnail->getPath());
-        $newPath = 
-            $thumbnailsDir
-            . '/' . substr($thubnail->getPath(), 0, $lastDotPosition) 
-            . '-' . $thubnail->getWidth() . 'x' . $thubnail->getHeight() 
-            . '.' . substr($thubnail->getPath(), $lastDotPosition + 1)
+    private function thumbnailPath(
+        string $imagePath,
+        int $width,
+        int $height,
+        string $resizeStrategyName,
+        float $scale
+    ): string {
+        $lastDotPosition = strrpos($imagePath, '.') ?: strlen($imagePath);
+        return
+            $this->configuration->thumbnailsDirectory()
+            . substr($imagePath, 0, $lastDotPosition)
+            . '-' . $resizeStrategyName
+            . '-' . $width . 'x' . $height
+            . '@' . str_replace([',', '.'], '-', (string)$scale) 
+            . '.' . substr($imagePath, $lastDotPosition + 1)
         ;
-        $thubnail->save($newPath, true);
     }
  }

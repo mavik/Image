@@ -90,7 +90,7 @@ class ImageFactory
     private function thumbnailsMaker(): ThumbnailsMaker
     {
         if (!isset($this->thumbnailsMaker)) {
-            $this->thumbnailsMaker = new ThumbnailsMaker();
+            $this->thumbnailsMaker = new ThumbnailsMaker($this->configuration);
         }
         return $this->thumbnailsMaker;
     }
