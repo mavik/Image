@@ -43,7 +43,7 @@ class Image
      * 
      * @param string $src Path or URL
      */
-    public static function create(string $src, Configuration $configuration): self
+    public static function create(string $src, Configuration $configuration): static
     {
         $fileName = new FileName($src, $configuration->baseUri(), $configuration->webRootDirectory());
         $imageFile = new ImageFile($fileName);
@@ -55,7 +55,7 @@ class Image
     /**
      * Create an instance from the string
      */
-    public static function createFromString(string $content, Configuration $configuration): self
+    public static function createFromString(string $content, Configuration $configuration): static
     {
         $image = new static($configuration);
         $image->resource = $configuration->graphicLibrary()->loadFromString($content);
@@ -64,12 +64,10 @@ class Image
         return $image;
     }
 
-    public function save(string $path, bool $isNewSrc = false): Image
+    public function save(string $path): static
     {
         $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
-        if ($isNewSrc) {
-            $this->file = new FileName($path, $this->configuration->baseUri(), $this->configuration->webRootDirectory());
-        }
+        $this->file = new FileName($path, $this->configuration->baseUri(), $this->configuration->webRootDirectory());
         return $this;
     }    
 

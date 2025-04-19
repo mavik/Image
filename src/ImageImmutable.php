@@ -18,23 +18,23 @@ class ImageImmutable extends Image
 {
     private $flagCloneResourceWhenCloning = true;
 
-    public static function create(string $src, Configuration $configuration): self
+    public static function create(string $src, Configuration $configuration): static
     {
         return parent::create($src, $configuration);
     }
 
-    public static function createFromString(string $content, Configuration $configuration): self
+    public static function createFromString(string $content, Configuration $configuration): static
     {
         return parent::createFromString($content, $configuration);
     }
 
-    public function resize(int $width, int $height): self
+    public function resize(int $width, int $height): static
     {
         $newResource = $this->graphicLibrary->resize($this->getResource(), $width, $height, true);
         return $this->cloneWithNewResource($newResource);
     }
 
-    public function crop(int $x, int $y, int $width, int $height): self
+    public function crop(int $x, int $y, int $width, int $height): static
     {
         $newResource = $this->graphicLibrary->crop($this->getResource(), $x, $y, $width, $height, true);
         return $this->cloneWithNewResource($newResource);
