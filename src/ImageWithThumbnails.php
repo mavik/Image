@@ -9,10 +9,13 @@ declare(strict_types=1);
  * @copyright 2021 Vitalii Marenkov
  * @license MIT; see LICENSE
  */
+
 namespace Mavik\Image;
 
 use Mavik\Image\ThumbnailsMaker\ResizeStrategyFactory;
 use Mavik\Image\ThumbnailsMaker;
+use Mavik\Image\ThumbnailsMaker\ResizeStrategyInterface;
+use Mavik\Plugin\Content\Thumbnails\Extension\Thumbnails;
 
 class ImageWithThumbnails extends ImageImmutable
 {
@@ -23,12 +26,20 @@ class ImageWithThumbnails extends ImageImmutable
         string $src,
         Configuration $configuration,
         ImageSize $thumbnailSize = null,
-        string $resizeType = 'stretch',
+        ResizeStrategyInterface $resizeStrategy = null,
+        ThumbnailsMaker $thumbnailsMaker = null,
+        string $thumbnailsDir = 'thumbnails',
         array $thumbnailScails = [1]
-    ): self {
+    ): static {
         $image = parent::create($src, $configuration);
-        if ($thumbnailSize) {
-            self::addThumbnails($image, $thumbnailSize, $resizeType, $thumbnailScails);
+        if ($thumbnailSize && $resizeStrategy && $thumbnailsMaker) {
+            $image->thumbnails = $thumbnailsMaker->createThumbnails(
+                $image,
+                $thumbnailSize,
+                $resizeStrategy,
+                $thumbnailsDir,
+                $thumbnailScails
+            );
         }
         return $image;
     }
@@ -37,12 +48,20 @@ class ImageWithThumbnails extends ImageImmutable
         string $content,
         Configuration $configuration,
         ImageSize $thumbnailSize = null,
-        string $resizeType = 'stretch',
+        ResizeStrategyInterface $resizeStrategy = null,
+        ThumbnailsMaker $thumbnailsMaker = null,
+        string $thumbnailsDir = 'thumbnails',
         array $thumbnailScails = [1]
-    ): self {
+    ): static {
         $image = parent::createFromString($content, $configuration);
         if ($thumbnailSize) {
-            self::addThumbnails($image, $thumbnailSize, $resizeType, $thumbnailScails);
+            $image->thumbnails = $thumbnailsMaker->createThumbnails(
+                $image,
+                $thumbnailSize,
+                $resizeStrategy,
+                $thumbnailsDir,
+                $thumbnailScails
+            );
         }
         return $image;        
     }
@@ -53,16 +72,5 @@ class ImageWithThumbnails extends ImageImmutable
     public function getThumbnails(): array 
     {
         return $this->thumbnails;
-    }
-
-    private static function addThumbnails(
-        self $image,
-        ImageSize $thumbnailSize,
-        string $resizeType,
-        array $thumbnailScails
-    ): void {
-        $resizeStrategy = ResizeStrategyFactory::create($resizeType);
-        $thumbnailsMaker = new ThumbnailsMaker($resizeStrategy);
-        $image->thumbnails = $thumbnailsMaker->createThumbnails($image, $thumbnailSize, $thumbnailScails);
     }
 }

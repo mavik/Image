@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace Mavik\Image;
 
+use Mavik\Image\ThumbnailsMaker\ResizeStrategyFactory;
+
 /**
  * Facade of the library
  */
@@ -18,6 +20,9 @@ class ImageFactory
 {
     /** @var Configuration */
     private $configuration;
+
+    /** @var ThumbnailsMaker */
+    private $thumbnailsMaker;
 
     public function __construct(Configuration $configuration)
     {
@@ -49,14 +54,17 @@ class ImageFactory
         int $width = null,
         int $height = null,
         string $resizeType = 'stretch',
+        string $thumbnailsDir = 'thumbnails',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::create(
             $src,
             $this->configuration,
             new ImageSize($width, $height),
-            $resizeType,
-            $thumbnailScails
+            ResizeStrategyFactory::create($resizeType),
+            $this->thumbnailsMaker(),
+            $thumbnailsDir,
+            $thumbnailScails,
         );
     }
     
@@ -65,14 +73,25 @@ class ImageFactory
         int $width = null,
         int $height = null,
         string $resizeType = 'stretch',
+        string $thumbnailsDir = 'thumbnails',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::createFromString(
             $content,
             $this->configuration,
             new ImageSize($width, $height),
-            $resizeType,
-            $thumbnailScails
+            ResizeStrategyFactory::create($resizeType),
+            $this->thumbnailsMaker(),
+            $thumbnailsDir,
+            $thumbnailScails,
         );
-    }    
+    }
+
+    private function thumbnailsMaker(): ThumbnailsMaker
+    {
+        if (!isset($this->thumbnailsMaker)) {
+            $this->thumbnailsMaker = new ThumbnailsMaker();
+        }
+        return $this->thumbnailsMaker;
+    }
 }

@@ -18,14 +18,6 @@ use Mavik\Image\ThumbnailsMaker\ResizeStrategyInterface;
  */
 class ThumbnailsMaker
 {
-    /** @var ResizeStrategyInterface */
-    private $resizeStrategy;
-
-    public function __construct(ResizeStrategyInterface $resizeStrategy)
-    {
-        $this->resizeStrategy = $resizeStrategy;
-    }
-    
     /**
      * Create thumbnails from $originalSrc
      * 
@@ -42,12 +34,14 @@ class ThumbnailsMaker
     public function createThumbnails(
         Image $image,
         ImageSize $thumbnailSize,
-        array $scales = [1]
+        ResizeStrategyInterface $resizeStrategy,
+        string $thumbnailsDir,
+        array $scales = [1],
     ): array {
         /** @var ImageImmutable[] $thumbnails **/
         $thumbnails = [];
         foreach ($scales as $scale) {
-            $thumbnail = $this->createThumbnailForScale($image, $thumbnailSize, $scale);
+            $thumbnail = $this->createThumbnailForScale($image, $thumbnailSize, $resizeStrategy, $thumbnailsDir, $scale);
             if ($thumbnail) {
                 $thumbnails[$scale] = $thumbnail;
             }
@@ -58,6 +52,8 @@ class ThumbnailsMaker
     private function createThumbnailForScale(
         Image $image,
         ImageSize $thumbnailSize,
+        ResizeStrategyInterface $resizeStrategy,
+        string $thumbnailsDir,
         float $scale
     ): ?ImageImmutable {
         $originalSize = $image->getSize(); 
@@ -65,9 +61,9 @@ class ThumbnailsMaker
         if (!$scaledThumbnailSize->lessThan($originalSize)) {
             return null;
         } 
-        $originalImageArea = $this->resizeStrategy->originalImageArea($originalSize, $scaledThumbnailSize);
-        $realThumbnailSize = $this->resizeStrategy->realThumbnailSize($originalSize, $scaledThumbnailSize);
-        return ($image instanceof ImageImmutable ? $image : clone $image)
+        $originalImageArea = $resizeStrategy->originalImageArea($originalSize, $scaledThumbnailSize);
+        $realThumbnailSize = $resizeStrategy->realThumbnailSize($originalSize, $scaledThumbnailSize);
+        $thumbnail = ($image instanceof ImageImmutable ? $image : clone $image)
             ->cropAndResize(
                 $originalImageArea->x,
                 $originalImageArea->y,
@@ -77,5 +73,19 @@ class ThumbnailsMaker
                 $realThumbnailSize->height
             )
         ;
+        $this->saveThumbnail($thumbnail, $thumbnailsDir);
+        return $thumbnail;
     }
-}
+
+    private function saveThumbnail(Image $thubnail, string $thumbnailsDir): void
+    {
+        $lastDotPosition = strrpos($thubnail->getPath(), '.') ?: strlen($thubnail->getPath());
+        $newPath = 
+            $thumbnailsDir
+            . '/' . substr($thubnail->getPath(), 0, $lastDotPosition) 
+            . '-' . $thubnail->getWidth() . 'x' . $thubnail->getHeight() 
+            . '.' . substr($thubnail->getPath(), $lastDotPosition + 1)
+        ;
+        $thubnail->save($newPath, true);
+    }
+ }
