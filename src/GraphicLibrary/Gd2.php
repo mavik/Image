@@ -44,7 +44,7 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource|GdImage $image
+     * @param resource|\GdImage $image
      * @param int $type IMAGETYPE_XXX
      */
     private function mapType($image, int $type): void
@@ -54,7 +54,7 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource|GdImage $image
+     * @param resource|\GdImage $image
      * @return int IMAGETYPE_XXX
      */
     private function getType($image): int
@@ -64,7 +64,7 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource|GdImage $image
+     * @param resource|\GdImage $image
      */
     private function unmapType($image): void
     {
@@ -73,7 +73,7 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @return resource|GDImage
+     * @return resource|\GDImage
      * @throws GraphicLibraryException
      */
     public function load(ImageFile $file)
@@ -108,7 +108,7 @@ class Gd2 implements GraphicLibraryInterface
     /**
      * Load image from binary string
      * 
-     * @return resource|GDImage
+     * @return resource|\GDImage
      * @throws GraphicLibraryException
      */
     public function loadFromString(string $content)
@@ -123,7 +123,7 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource|GDImage $image
+     * @param resource|\GDImage $image
      */
     public function close($image): void
     {
@@ -132,7 +132,7 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource|GDImage $image
+     * @param resource|\GDImage $image
      * @param int $type IMAGETYPE_XXX
      * @throws GraphicLibraryException
      */
@@ -161,8 +161,8 @@ class Gd2 implements GraphicLibraryInterface
     }   
 
     /**
-     * @param resource|GDImage $image
-     * @return resource|GDImage
+     * @param resource|\GDImage $image
+     * @return resource|\GDImage
      */
     public function clone($image)
     {
@@ -174,7 +174,7 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource|GDImage $image
+     * @param resource|\GDImage $image
      */
     public function getHeight($image): int
     {
@@ -182,7 +182,7 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource|GDImage $image
+     * @param resource|\GDImage $image
      */
     public function getWidth($image): int
     {
@@ -190,8 +190,8 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource|GDImage $image
-     * @return resource|GDImage
+     * @param resource|\GDImage $image
+     * @return resource|\GDImage
      */
     public function crop($image, int $x, int $y, int $width, int $height, bool $immutable = false)
     {
@@ -215,8 +215,8 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource|GDImage $image
-     * @return resource|GDImage
+     * @param resource|\GDImage $image
+     * @return resource|\GDImage
      */
     public function resize($image, int $width, int $height, bool $immutable = false)
     {
@@ -224,8 +224,8 @@ class Gd2 implements GraphicLibraryInterface
     }
 
     /**
-     * @param resource|GDImage $image
-     * @return resource|GDImage
+     * @param resource|\GDImage $image
+     * @return resource|\GDImage
      */
     public function cropAndResize($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable = false)
     {
@@ -237,8 +237,8 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource|GDImage $image
-     * @return resource|GDImage
+     * @param resource|\GDImage $image
+     * @return resource|\GDImage
      */
     private function cropAndResizeTrueColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable)
     {
@@ -259,8 +259,8 @@ class Gd2 implements GraphicLibraryInterface
     }
     
     /**
-     * @param resource|GDImage $image
-     * @return resource|GDImage
+     * @param resource|\GDImage $image
+     * @return resource|\GDImage
      */
     private function cropAndResizeIndexedColors($image, int $x, int $y, int $width, int $height, int $toWidth, int $toHeight, bool $immutable)
     {

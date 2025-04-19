@@ -25,7 +25,8 @@ class ImageWithThumbnailsTest extends TestCase
         self::$imageFactory = new ImageFactory(
             new Configuration(
                 'http://test.com/',
-                __DIR__ . '/../resources'
+                __DIR__ . '/../resources',
+                'thubmnails',
             )
         );
     }    
@@ -42,6 +43,7 @@ class ImageWithThumbnailsTest extends TestCase
             100,
             200,
             'fill',
+            'thubmnails',
             [1,2]
         );
         $this->assertEquals(ImageWithThumbnails::class, get_class($image));

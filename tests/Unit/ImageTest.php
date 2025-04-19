@@ -27,7 +27,8 @@ class ImageTest extends TestCase
         HttpServer::start();        
         self::$configuration = new Configuration(
             'http://test.com/',
-            __DIR__ . '/../resources'
+            __DIR__ . '/../resources',
+            'thumbnails',
         );
     }
 

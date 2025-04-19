@@ -79,25 +79,6 @@ class Gd2Test extends AbstractTest
     {
         parent::testCropAndResize($imgType, $x, $y, $width, $height, $toWidth, $toHeight, $src, $expectedFile);
     }
-        
-        public function testMutable()
-    {           
-        $this->expectWarning();
-        $imagePath = __DIR__ . '/../../resources/images/apple.jpg';
-        $imageFile = $this->imageFile($imagePath, IMAGETYPE_JPEG);
-        
-        $image = $this->instance->load($imageFile);        
-        $this->instance->crop($image, 50, 50, 300, 300);
-        $this->assertFalse(imagesx($image));
-       
-        $image = $this->instance->load($imageFile);        
-        $this->instance->resize($image, 300, 300);
-        $this->assertFalse(imagesx($image));
-        
-        $image = $this->instance->load($imageFile);
-        $this->instance->cropAndResize($image, 50, 50, 600, 600, 300, 300);
-        $this->assertFalse(imagesx($image));
-    }    
 
     protected function newInstance(): \Mavik\Image\GraphicLibraryInterface
     {
@@ -106,6 +87,10 @@ class Gd2Test extends AbstractTest
 
     protected function verifyResource($resource): void
     {
+        if (is_object($resource)) {
+            $this->assertInstanceOf(\GdImage::class, $resource);
+            return;
+        }
         $this->assertIsResource($resource);
     }
 

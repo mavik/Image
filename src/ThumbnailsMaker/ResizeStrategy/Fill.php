@@ -31,8 +31,8 @@ class Fill implements ResizeStrategyInterface
         if ($originalSize->width/$originalSize->height < $thumbnailSize->width/$thumbnailSize->height) {
                 $x = 0;
                 $widht = $originalSize->width;
-                $height = round($thumbnailSize->height * $widht/$thumbnailSize->width);
-                $y = round(($originalSize->height - $height)/2);
+                $height = (int)round($thumbnailSize->height * $widht/$thumbnailSize->width);
+                $y = (int)round(($originalSize->height - $height)/2);
         } else {
                 $y = 0;
                 $height = $originalSize->height;

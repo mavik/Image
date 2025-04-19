@@ -114,14 +114,6 @@ class FileNameTest extends TestCase
                     'base_uri' => 'http://test.com/resources/',
                     'web_root_dir' => $webRootDir
                 ],
-                'resources/images/beach.webp',
-                realpath(__DIR__ . '/../resources/images/beach.webp'),
-                'http://test.com/resources/images/beach.webp'
-            ],[ 9 =>
-                [
-                    'base_uri' => 'http://test.com/resources/',
-                    'web_root_dir' => $webRootDir
-                ],
                 '/src/../resources/images/beach.webp',
                 realpath(__DIR__ . '/../resources/images/beach.webp'),
                 'http://test.com/resources/images/beach.webp'

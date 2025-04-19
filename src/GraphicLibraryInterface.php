@@ -19,21 +19,21 @@ interface GraphicLibraryInterface
     /**
      * Load image from file
      * 
-     * @return mix Resource or object, depends on graphic library
+     * @return mixed Resource or object, depends on graphic library
      */
     public function load(ImageFile $file);
     
     /**
      * Load image from binary string
      * 
-     * @return mix Resource or object, depends on graphic library
+     * @return mixed Resource or object, depends on graphic library
      */
     public function loadFromString(string $content);
 
     /**
      * Save image to file
      * 
-     * @param mix $image Type depends on graphic library
+     * @param mixed $image Type depends on graphic library
      * @param int $type IMAGETYPE_XXX
      * @return void
      */
@@ -42,7 +42,7 @@ interface GraphicLibraryInterface
     /**
      * Free resources
      * 
-     * @param mix $image Type depends on graphic library
+     * @param mixed $image Type depends on graphic library
      */
     public function close($image): void;
 
@@ -53,12 +53,12 @@ interface GraphicLibraryInterface
     public function clone($image);
 
     /**
-     * @param mix $image Type depends on graphic library
+     * @param mixed $image Type depends on graphic library
      */
     public function getWidth($image): int;
     
     /**
-     * @param mix $image Type depends on graphic library
+     * @param mixed $image Type depends on graphic library
      */
     public function getHeight($image): int;
     
