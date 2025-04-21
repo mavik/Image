@@ -6,7 +6,7 @@ declare(strict_types=1);
  * @package Mavik\Image
  * @author Vitalii Marenkov <admin@mavik.com.ua>
  * @copyright 2021 Vitalii Marenkov
- * @license MIT; see LICENSE
+ * @license GNU General Public License version 2 or later; see LICENSE
  */
 namespace Mavik\Image;
 
