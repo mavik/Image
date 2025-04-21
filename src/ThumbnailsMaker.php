@@ -63,12 +63,15 @@ class ThumbnailsMaker
         ResizeStrategyInterface $resizeStrategy,
         float $scale
     ): ?ImageImmutable {
+        $originalSize = $image->getSize();
+        $scaledThumbnailSize = $thumbnailSize->scale($scale);
+        if (!$scaledThumbnailSize->lessThan($originalSize)) {
+            return null;
+        }
         $thumbnailPath = $this->thumbnailPath(
             $image,
-            $thumbnailSize->width,
-            $thumbnailSize->height,
+            $scaledThumbnailSize,
             $resizeStrategy->name(),
-            $scale
         );
         if (file_exists($thumbnailPath) && filemtime($thumbnailPath) >= filemtime($image->getPath())) {
             return ImageImmutable::create($thumbnailPath, $this->configuration);
@@ -111,10 +114,8 @@ class ThumbnailsMaker
 
     private function thumbnailPath(
         Image $image,
-        int $width,
-        int $height,
+        ImageSize $scaledThumbnailSize,
         string $resizeStrategyName,
-        float $scale
     ): string {
         $imagePath = $image->getPath();
         if ($imagePath && strpos($imagePath, $this->configuration->webRootDirectory()) === 0) {
@@ -127,8 +128,7 @@ class ThumbnailsMaker
             $this->configuration->thumbnailsDirectory()
             . substr($imagePath, 0, $lastDotPosition)
             . '-' . $resizeStrategyName
-            . '-' . $width . 'x' . $height
-            . '@' . str_replace([',', '.'], '-', (string)$scale)
+            . '-' . $scaledThumbnailSize->width . 'x' . $scaledThumbnailSize->height
             . '.' . substr($imagePath, $lastDotPosition + 1);
     }
 }
