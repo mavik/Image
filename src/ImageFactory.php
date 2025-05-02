@@ -63,7 +63,6 @@ class ImageFactory
             new ImageSize($width, $height),
             ResizeStrategyFactory::create($resizeType),
             $this->thumbnailsMaker(),
-            $thumbnailsDir,
             $thumbnailScails,
         );
     }
@@ -82,7 +81,6 @@ class ImageFactory
             new ImageSize($width, $height),
             ResizeStrategyFactory::create($resizeType),
             $this->thumbnailsMaker(),
-            $thumbnailsDir,
             $thumbnailScails,
         );
     }
