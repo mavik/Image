@@ -51,15 +51,15 @@ class ImageFactory
     
     public function createImageWithThumbnails(
         string $src,
-        int $width = null,
-        int $height = null,
+        int $thumbnailWidth = null,
+        int $thumbnailHeight = null,
         string $resizeType = 'stretch',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::create(
             $src,
             $this->configuration,
-            new ImageSize($width, $height),
+            new ImageSize($thumbnailWidth, $thumbnailHeight),
             ResizeStrategyFactory::create($resizeType),
             $this->thumbnailsMaker(),
             $thumbnailScails,
@@ -68,15 +68,15 @@ class ImageFactory
     
     public function createImageWithThumbnailsFromString(
         string $content,
-        int $width = null,
-        int $height = null,
+        int $thumbnailWidth = null,
+        int $thumbnailHeight = null,
         string $resizeType = 'stretch',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::createFromString(
             $content,
             $this->configuration,
-            new ImageSize($width, $height),
+            new ImageSize($thumbnailWidth, $thumbnailHeight),
             ResizeStrategyFactory::create($resizeType),
             $this->thumbnailsMaker(),
             $thumbnailScails,
