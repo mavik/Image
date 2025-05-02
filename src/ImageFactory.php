@@ -54,7 +54,6 @@ class ImageFactory
         int $width = null,
         int $height = null,
         string $resizeType = 'stretch',
-        string $thumbnailsDir = 'thumbnails',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::create(
@@ -72,7 +71,6 @@ class ImageFactory
         int $width = null,
         int $height = null,
         string $resizeType = 'stretch',
-        string $thumbnailsDir = 'thumbnails',
         array $thumbnailScails = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::createFromString(
