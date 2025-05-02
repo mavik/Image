@@ -12,15 +12,25 @@ declare(strict_types=1);
 
 namespace Mavik\Image;
 
-use Mavik\Image\ThumbnailsMaker\ResizeStrategyFactory;
 use Mavik\Image\ThumbnailsMaker;
 use Mavik\Image\ThumbnailsMaker\ResizeStrategyInterface;
-use Mavik\Plugin\Content\Thumbnails\Extension\Thumbnails;
 
 class ImageWithThumbnails extends ImageImmutable
 {
     /** @var ImageImmutable[] */
     private $thumbnails = [];
+
+    /** @var ImageSize */
+    private $thumbnailSize;
+
+    /** @var ResizeStrategyInterface */
+    private $resizeStrategy;
+
+    /** @var int[] */
+    private $thumbnailScails;
+
+    /** @var ThumbnailsMaker */
+    private $thumbnailsMaker;
 
     public static function create(
         string $src,
@@ -28,18 +38,13 @@ class ImageWithThumbnails extends ImageImmutable
         ImageSize $thumbnailSize = null,
         ResizeStrategyInterface $resizeStrategy = null,
         ThumbnailsMaker $thumbnailsMaker = null,
-        string $thumbnailsDir = 'thumbnails',
-        array $thumbnailScails = [1]
+        array $thumbnailScails = [1],
     ): static {
         $image = parent::create($src, $configuration);
-        if ($thumbnailSize && $resizeStrategy && $thumbnailsMaker) {
-            $image->thumbnails = $thumbnailsMaker->thumbnails(
-                $image,
-                $thumbnailSize,
-                $resizeStrategy,
-                $thumbnailScails
-            );
-        }
+        $image->thumbnailSize = $thumbnailSize;
+        $image->resizeStrategy = $resizeStrategy;
+        $image->thumbnailsMaker = $thumbnailsMaker;
+        $image->thumbnailScails = $thumbnailScails;
         return $image;
     }
 
@@ -49,26 +54,38 @@ class ImageWithThumbnails extends ImageImmutable
         ImageSize $thumbnailSize = null,
         ResizeStrategyInterface $resizeStrategy = null,
         ThumbnailsMaker $thumbnailsMaker = null,
-        string $thumbnailsDir = 'thumbnails',
-        array $thumbnailScails = [1]
+        array $thumbnailScails = [1],
     ): static {
         $image = parent::createFromString($content, $configuration);
-        if ($thumbnailSize) {
-            $image->thumbnails = $thumbnailsMaker->thumbnails(
-                $image,
-                $thumbnailSize,
-                $resizeStrategy,
-                $thumbnailScails
-            );
-        }
-        return $image;        
+        $image->thumbnailSize = $thumbnailSize;
+        $image->resizeStrategy = $resizeStrategy;
+        $image->thumbnailsMaker = $thumbnailsMaker;
+        $image->thumbnailScails = $thumbnailScails;
+        return $image;
     }
     
     /**
      * @return ImageImmutable[]
      */
-    public function getThumbnails(): array 
+    public function thumbnails(): array 
     {
+        if (!isset($this->thumbnails)) {
+            if (
+                isset($this->thumbnailSize)
+                && isset($this->resizeStrategy)
+                && isset($this->thumbnailsMaker)
+                && !empty($this->thumbnailScails)
+            ) {
+                $this->thumbnails = $this->thumbnailsMaker->thumbnails(
+                    $this,
+                    $this->thumbnailSize,
+                    $this->resizeStrategy,
+                    $this->thumbnailScails
+                );
+            } else {
+                $this->thumbnails = [];
+            }  
+        }
         return $this->thumbnails;
     }
 }
