@@ -54,7 +54,7 @@ class ImageFactory
         int $thumbnailWidth = null,
         int $thumbnailHeight = null,
         string $resizeType = 'stretch',
-        array $thumbnailScails = [1]
+        array $thumbnailScales = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::create(
             $src,
@@ -62,7 +62,7 @@ class ImageFactory
             new ImageSize($thumbnailWidth, $thumbnailHeight),
             ResizeStrategyFactory::create($resizeType),
             $this->thumbnailsMaker(),
-            $thumbnailScails,
+            $thumbnailScales,
         );
     }
     
@@ -71,7 +71,7 @@ class ImageFactory
         int $thumbnailWidth = null,
         int $thumbnailHeight = null,
         string $resizeType = 'stretch',
-        array $thumbnailScails = [1]
+        array $thumbnailScales = [1]
     ): ImageWithThumbnails {
         return ImageWithThumbnails::createFromString(
             $content,
@@ -79,7 +79,24 @@ class ImageFactory
             new ImageSize($thumbnailWidth, $thumbnailHeight),
             ResizeStrategyFactory::create($resizeType),
             $this->thumbnailsMaker(),
-            $thumbnailScails,
+            $thumbnailScales,
+        );
+    }
+
+    public function convertImageToImageWithThumbnails(
+        Image $image,
+        int $thumbWidth,
+        int $thumbHeight,
+        string $resizeType ='stretch',
+        array $thumbnailScales = [1]
+    ): ImageWithThumbnails {
+        return ImageWithThumbnails::convertImage(
+            $image,
+            $this->configuration,
+            new ImageSize($thumbWidth, $thumbHeight),
+            ResizeStrategyFactory::create($resizeType),
+            $this->thumbnailsMaker(),
+            $thumbnailScales,
         );
     }
 
