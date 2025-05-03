@@ -63,7 +63,32 @@ class ImageWithThumbnails extends ImageImmutable
         $image->thumbnailScails = $thumbnailScails;
         return $image;
     }
-    
+
+    /**
+     * Create an instance from the Image and destroy the Image
+     */
+    public static function convertImage(
+        Image $image,
+        Configuration $configuration,
+        ImageSize $thumbnailSize = null,
+        ResizeStrategyInterface $resizeStrategy = null,
+        ThumbnailsMaker $thumbnailsMaker = null,
+        array $thumbnailScails = [1],
+    ): static {
+        $imageWithThumbnails = new static($configuration);
+        $imageWithThumbnails->resource = $image->resource;
+        $imageWithThumbnails->type = $image->type;
+        $imageWithThumbnails->size = $image->size;
+        $imageWithThumbnails->file = $image->file;
+        $imageWithThumbnails->graphicLibrary = $image->graphicLibrary;
+        $imageWithThumbnails->thumbnailSize = $thumbnailSize;
+        $imageWithThumbnails->resizeStrategy = $resizeStrategy;
+        $imageWithThumbnails->thumbnailsMaker = $thumbnailsMaker;
+        $imageWithThumbnails->thumbnailScails = $thumbnailScails;
+        unset($image);
+        return $imageWithThumbnails;
+    }
+
     /**
      * @return ImageImmutable[]
      */

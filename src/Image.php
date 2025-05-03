@@ -17,10 +17,10 @@ class Image
     protected $resource;
     
     /** @var int constant IMAGETYPE_XXX */
-    private $type;
+    protected $type;
     
     /** @var ImageSize **/
-    private $size;
+    protected $size;
 
     /** @var ImageFile */
     protected $file;
@@ -31,7 +31,7 @@ class Image
     /** @var GraphicLibraryInterface */
     protected $graphicLibrary;
     
-    private function __construct(
+    protected function __construct(
         Configuration $configuration
     ) {
         $this->graphicLibrary = $configuration->graphicLibrary();
