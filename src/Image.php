@@ -12,32 +12,32 @@ declare(strict_types=1);
 namespace Mavik\Image;
 
 class Image
-{    
-    /** @var mix */
+{
+    /** @var mixed */
     protected $resource;
-    
+
     /** @var int constant IMAGETYPE_XXX */
     protected $type;
-    
+
     /** @var ImageSize **/
     protected $size;
 
     /** @var ImageFile */
     protected $file;
-    
+
     /** @var Configuration */
     protected $configuration;
 
     /** @var GraphicLibraryInterface */
     protected $graphicLibrary;
-    
-    protected function __construct(
+
+    final protected function __construct(
         Configuration $configuration
     ) {
         $this->graphicLibrary = $configuration->graphicLibrary();
         $this->configuration = $configuration;
     }
-    
+
     /**
      * Create an instance from the file
      * 
@@ -51,7 +51,7 @@ class Image
         $image->file = $imageFile;
         return $image;
     }
-    
+
     /**
      * Create an instance from the string
      */
@@ -75,18 +75,18 @@ class Image
         $this->graphicLibrary->save($this->getResource(), $path, $this->getType());
         $this->file = new FileName($path, $this->configuration->baseUri(), $this->configuration->webRootDirectory());
         return $this;
-    }    
+    }
 
     public function getUrl(): ?string
     {
         return $this->file ? $this->file->getUrl() : null;
     }
-    
+
     public function getPath(): ?string
     {
         return $this->file ? $this->file->getPath() : null;
     }
-    
+
     /**
      * @return int|null IMAGETYPE_XXX
      */
@@ -112,7 +112,7 @@ class Image
         }
         return $this->size;
     }
-    
+
     /**
      * Alias for getSize()->width
      */
@@ -120,7 +120,7 @@ class Image
     {
         return $this->getSize()->width;
     }
-    
+
     /**
      * Alias for getSize()->height
      */
@@ -136,12 +136,12 @@ class Image
             $this->graphicLibrary->getHeight($this->resource)
         );
     }
-    
+
     public function getFileSize(): ?int
     {
         return $this->file ? $this->file->getFileSize() : null;
-    }    
-    
+    }
+
     public function resize(int $width, int $height): Image
     {
         $this->resource = $this->graphicLibrary->resize($this->getResource(), $width, $height);
@@ -168,9 +168,9 @@ class Image
         $this->resetSize();
         return $this;
     }
-    
+
     /**
-     * @return mix Depends on graphic library
+     * @return mixed Depends on graphic library
      */
     protected function getResource()
     {
@@ -179,7 +179,7 @@ class Image
         }
         return $this->resource;
     }
-    
+
     /**
      * Unset width and height
      */
@@ -187,7 +187,7 @@ class Image
     {
         $this->size = null;
     }
-    
+
     public function __clone()
     {
         if (isset($this->file)) {
